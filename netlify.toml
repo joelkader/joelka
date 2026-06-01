@@ -1,0 +1,15 @@
+# Netlify configuration for the WC 2026 Pool (Next.js).
+#
+# Netlify auto-detects Next.js and installs the official Next.js Runtime
+# (@netlify/plugin-nextjs) for you — no need to list it here. The API routes
+# run as serverless functions; persistence uses Netlify Blobs (see lib/store.ts),
+# which is zero-config on Netlify.
+#
+# Set ADMIN_PASSWORD in the Netlify UI: Site settings → Environment variables.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"

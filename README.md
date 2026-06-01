@@ -52,16 +52,39 @@ npm run dev
 3. Rename "Player 1…6" to real names in the admin panel (or in
    `data/tournament.ts`).
 
+## Deploying to Netlify
+
+The app is Netlify-ready. Persistence auto-switches backends: a local JSON file
+for `npm run dev`, and **Netlify Blobs** once deployed (durable, zero-config —
+no database to provision, and it survives Netlify's read-only/ephemeral function
+filesystem). The swap lives entirely in `lib/store.ts`.
+
+Steps:
+
+1. Push this repo to GitHub (already done if you're reading this on a branch).
+2. In Netlify: **Add new site → Import an existing project**, pick the repo.
+   Netlify auto-detects Next.js and installs its Next.js Runtime — no build
+   config needed beyond the included `netlify.toml`.
+3. Set one environment variable: **Site settings → Environment variables →**
+   `ADMIN_PASSWORD` = your real password.
+4. Deploy. Visit the site URL; go to `/admin` and enter that password to assign
+   owners and tick results. State is stored in Netlify Blobs and shared by all
+   visitors.
+
+No keys are needed for Netlify Blobs — the deploy context is injected at
+runtime. To deploy from the CLI instead, `npm i -g netlify-cli && netlify deploy
+--build --prod` (set `ADMIN_PASSWORD` via `netlify env:set` or the UI first).
+
 ---
 
 ## TODO for Claude Code (suggested extensions)
 
 The base runs as-is. Good next steps, roughly in priority order:
 
-1. **Deploy-ready persistence.** The JSON-file store won't survive on Vercel
-   (ephemeral FS). Swap `lib/store.ts` for **Vercel KV** or **Upstash Redis**
-   (both have free tiers). Only `loadState()` / `saveState()` need to change —
-   everything else is untouched. Add the env vars and a short setup note here.
+1. **Deploy-ready persistence.** ✅ Done — `lib/store.ts` now uses Netlify Blobs
+   in production (file fallback locally), so it survives serverless. See
+   "Deploying to Netlify" above. (Swapping to Vercel KV / Upstash Redis would be
+   the same single-seam change if you target a different host.)
 
 2. **Auth hardening.** Right now admin is a single shared password sent in the
    POST body. Fine for friends, but consider: move it to an `Authorization`

@@ -5,6 +5,6 @@ import { loadState } from "@/lib/store";
 export const dynamic = "force-dynamic"; // never cache; always fresh
 
 export async function GET() {
-  const state = loadState();
+  const state = await loadState();
   return NextResponse.json(state);
 }

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const state = loadState();
+  const state = await loadState();
 
   if (Array.isArray(body.results)) {
     state.results = body.results as TeamResult[];
@@ -24,6 +24,6 @@ export async function POST(req: NextRequest) {
     state.players = body.players as string[];
   }
 
-  saveState(state);
+  await saveState(state);
   return NextResponse.json({ ok: true, lastUpdated: state.lastUpdated });
 }
