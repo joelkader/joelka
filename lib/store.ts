@@ -77,6 +77,17 @@ async function getBlobStore() {
   }
 }
 
+// Bound any storage call so a hung backend can never block the serverless
+// function until its hard timeout (which surfaces as "slow, then error").
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("storage timeout")), ms)
+    ),
+  ]);
+}
+
 function readFile(): PoolState | null {
   try {
     return heal(JSON.parse(fs.readFileSync(STATE_PATH, "utf-8")) as PoolState);
@@ -95,13 +106,16 @@ export async function loadState(): Promise<PoolState> {
   const store = await getBlobStore();
   if (store) {
     try {
-      const parsed = (await store.get(BLOB_KEY, { type: "json" })) as PoolState | null;
+      const parsed = (await withTimeout(
+        store.get(BLOB_KEY, { type: "json" }),
+        4000
+      )) as PoolState | null;
       if (parsed) return heal(parsed);
       const seeded = seedState();
-      await store.setJSON(BLOB_KEY, seeded);
+      await withTimeout(store.setJSON(BLOB_KEY, seeded), 4000);
       return seeded;
     } catch {
-      // Blobs reachable check failed — never 500 the page; serve the seed.
+      // Blobs unreachable/slow — never hang or 500 the page; serve the seed.
       return seedState();
     }
   }
@@ -123,7 +137,7 @@ export async function saveState(state: PoolState): Promise<void> {
 
   const store = await getBlobStore();
   if (store) {
-    await store.setJSON(BLOB_KEY, state);
+    await withTimeout(store.setJSON(BLOB_KEY, state), 6000);
     return;
   }
 
