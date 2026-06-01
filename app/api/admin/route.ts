@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const expected = process.env.ADMIN_PASSWORD ?? "GGPPotAdmin2026";
+  const expected = process.env.ADMIN_PASSWORD ?? "GGPAdmin26";
 
   if (body.password !== expected) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
