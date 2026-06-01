@@ -1,17 +1,17 @@
 // ============================================================================
 // STORE — persistence with a single seam (loadState / saveState)
 // ============================================================================
-// Two backends, picked automatically:
+// Two backends, chosen by what's actually available at runtime — no env-var
+// guessing:
 //
-//   • On Netlify  -> Netlify Blobs (durable, zero-config — no env vars needed,
-//                    the deploy context is injected at runtime). Survives the
-//                    read-only / ephemeral serverless filesystem.
-//   • Locally     -> JSON file at data/state.json (gitignored). Great for
-//                    `npm run dev` and single-server use.
+//   1. Netlify Blobs  — used whenever the Netlify runtime context exists
+//                        (i.e. when deployed). Durable, zero-config, and
+//                        survives the read-only / ephemeral function FS.
+//   2. JSON file      — used locally (`npm run dev`), at data/state.json.
 //
-// The rest of the app only ever touches loadState/saveState, so this module is
-// the only place that knows where state actually lives. Both functions are
-// async (Netlify Blobs is async); callers await them.
+// loadState NEVER throws: if a backend is unavailable it degrades to the
+// in-memory seed so the API always returns 200 rather than 500ing the site.
+// The rest of the app only ever touches loadState/saveState. Both are async.
 // ============================================================================
 
 import fs from "fs";
@@ -65,54 +65,67 @@ function heal(state: PoolState): PoolState {
   return state;
 }
 
-// Are we running on Netlify? Netlify injects these at build and at function
-// runtime; locally none are set, so we use the file backend.
-function onNetlify(): boolean {
-  return !!(
-    process.env.NETLIFY ||
-    process.env.NETLIFY_BLOBS_CONTEXT ||
-    process.env.NETLIFY_LOCAL
-  );
+// Returns the Netlify Blobs store, or null if the Netlify context isn't
+// available (e.g. local dev) — getStore throws without siteID/token, which is
+// our signal to use the file backend instead.
+async function getBlobStore() {
+  try {
+    const { getStore } = await import("@netlify/blobs");
+    return getStore(BLOB_STORE);
+  } catch {
+    return null;
+  }
 }
 
-async function getBlobStore() {
-  // Dynamic import so local dev doesn't need the package resolved eagerly.
-  const { getStore } = await import("@netlify/blobs");
-  return getStore(BLOB_STORE);
+function readFile(): PoolState | null {
+  try {
+    return heal(JSON.parse(fs.readFileSync(STATE_PATH, "utf-8")) as PoolState);
+  } catch {
+    return null;
+  }
+}
+
+function writeFile(state: PoolState): void {
+  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
+  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), "utf-8");
 }
 
 export async function loadState(): Promise<PoolState> {
-  if (onNetlify()) {
-    const store = await getBlobStore();
-    const parsed = (await store.get(BLOB_KEY, { type: "json" })) as PoolState | null;
-    if (!parsed) {
+  // 1. Netlify Blobs, if we're running on Netlify.
+  const store = await getBlobStore();
+  if (store) {
+    try {
+      const parsed = (await store.get(BLOB_KEY, { type: "json" })) as PoolState | null;
+      if (parsed) return heal(parsed);
       const seeded = seedState();
       await store.setJSON(BLOB_KEY, seeded);
       return seeded;
+    } catch {
+      // Blobs reachable check failed — never 500 the page; serve the seed.
+      return seedState();
     }
-    return heal(parsed);
   }
 
-  // Local file backend.
+  // 2. Local file backend (seed + persist on first run).
+  const fromFile = readFile();
+  if (fromFile) return fromFile;
+  const seeded = seedState();
   try {
-    const raw = fs.readFileSync(STATE_PATH, "utf-8");
-    return heal(JSON.parse(raw) as PoolState);
+    writeFile(seeded);
   } catch {
-    const seeded = seedState();
-    await saveState(seeded);
-    return seeded;
+    // Read-only FS — still serve the seed.
   }
+  return seeded;
 }
 
 export async function saveState(state: PoolState): Promise<void> {
   state.lastUpdated = new Date().toISOString();
 
-  if (onNetlify()) {
-    const store = await getBlobStore();
+  const store = await getBlobStore();
+  if (store) {
     await store.setJSON(BLOB_KEY, state);
     return;
   }
 
-  fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
-  fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), "utf-8");
+  writeFile(state);
 }
