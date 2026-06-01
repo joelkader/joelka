@@ -37,13 +37,31 @@ function seedState(): PoolState {
   };
 }
 
-// Self-heal: ensure every known team exists (in case data/tournament.ts changed
-// after some state was already saved). Mutates and returns the same object.
+// Self-heal: keep persisted state in sync with data/tournament.ts (the source
+// of truth) so edits there propagate to an already-seeded store. Mutates and
+// returns the same object.
 function heal(state: PoolState): PoolState {
+  const tierByTeam = new Map(TEAMS.map((t) => [t.name, t.tier]));
+
+  // Add any newly-listed teams.
   const known = new Set(state.results.map((r) => r.team));
   for (const t of TEAMS) {
     if (!known.has(t.name)) state.results.push(emptyResult(t.name, t.tier));
   }
+
+  // Reconcile tiers — tier is set in the data file, never edited in the admin
+  // panel, so the data file always wins (e.g. Germany/Netherlands → Favorite).
+  for (const r of state.results) {
+    const tier = tierByTeam.get(r.team);
+    if (tier && r.tier !== tier) r.tier = tier;
+  }
+
+  // Reconcile the roster only when its size changes (e.g. 6 → 8 players). We
+  // avoid clobbering on every load so admin-panel name edits still persist.
+  if (state.players.length !== PLAYERS.length) {
+    state.players = [...PLAYERS];
+  }
+
   return state;
 }
 

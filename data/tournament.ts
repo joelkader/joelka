@@ -35,9 +35,9 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "Brazil", tier: "Favorite" },
   { name: "Argentina", tier: "Favorite" },
   { name: "Portugal", tier: "Favorite" },
+  { name: "Germany", tier: "Favorite" },
+  { name: "Netherlands", tier: "Favorite" },
   // Contenders
-  { name: "Germany", tier: "Contender" },
-  { name: "Netherlands", tier: "Contender" },
   { name: "Belgium", tier: "Contender" },
   { name: "Croatia", tier: "Contender" },
   { name: "Uruguay", tier: "Contender" },
@@ -82,15 +82,18 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "New Zealand", tier: "Longshot" },
 ];
 
-// The 6 players. Swap "Player N" for real names after the draw.
+// The 8 players. Edit names here; this is the source of truth for who's in.
 export const PLAYERS = [
-  "Player 1",
-  "Player 2",
-  "Player 3",
-  "Player 4",
-  "Player 5",
-  "Player 6",
+  "Yaniv B.",
+  "Jeff W.",
+  "Gaurav J.",
+  "Joel K.",
+  "Robert L.",
+  "Paul G.",
+  "Sofia R.",
+  "Aviv B.",
 ];
 
-export const POT = 180;
-export const PAYOUTS = { first: 110, second: 50, third: 20 };
+// 8 players × $30 buy-in.
+export const POT = 240;
+export const PAYOUTS = { first: 150, second: 60, third: 30 };
