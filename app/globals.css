@@ -1,0 +1,103 @@
+:root {
+  --bg: #0f1115;
+  --panel: #181b22;
+  --panel-2: #1f242d;
+  --border: #2a2f3a;
+  --text: #e8eaed;
+  --muted: #9aa3b2;
+  --gold: #d4a13c;
+  --gold-dim: #8a6a26;
+  --navy: #2b4a8b;
+  --t-fav: #e57373;
+  --t-con: #d4a13c;
+  --t-mid: #6fbf73;
+  --t-long: #5b9bd5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  line-height: 1.5;
+}
+
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+
+.nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+.nav .brand { font-weight: 700; color: var(--gold); letter-spacing: 0.5px; }
+.nav a { color: var(--muted); font-size: 14px; }
+.nav a:hover { color: var(--text); }
+
+h1 { font-size: 26px; margin: 24px 0 4px; }
+h2 { font-size: 18px; margin: 28px 0 12px; color: var(--gold); }
+.sub { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.rank { font-weight: 700; color: var(--gold); width: 36px; }
+.pts { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.tier-badge {
+  display: inline-block; padding: 1px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; color: #0f1115;
+}
+.tier-Favorite { background: var(--t-fav); }
+.tier-Contender { background: var(--t-con); }
+.tier-Mid { background: var(--t-mid); }
+.tier-Longshot { background: var(--t-long); }
+
+.leader-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; background: var(--panel-2); margin-bottom: 8px; }
+.leader-row.first { border: 1px solid var(--gold); }
+.leader-name { flex: 1; font-weight: 600; font-size: 16px; }
+.bar-wrap { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.bar { height: 100%; background: var(--gold); }
+
+.player-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.player-links a { display: block; padding: 14px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); text-align: center; font-weight: 600; }
+.player-links a:hover { border-color: var(--gold); text-decoration: none; }
+
+label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+input, select, button {
+  font: inherit; color: var(--text); background: var(--panel-2);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+}
+input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); }
+button {
+  background: var(--gold); color: #0f1115; font-weight: 700; cursor: pointer; border: none;
+}
+button:hover { background: #e3b14c; }
+button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.admin-team { display: grid; grid-template-columns: 1.4fr 0.9fr 1fr repeat(8, auto); gap: 8px; align-items: center; padding: 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.admin-team .name { font-weight: 600; }
+.flag { font-size: 12px; color: var(--muted); }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #0f1115; padding: 10px 18px; border-radius: 999px; font-weight: 700; }
+.muted { color: var(--muted); font-size: 13px; }
+.payout { font-size: 13px; color: var(--muted); margin-top: 4px; }
