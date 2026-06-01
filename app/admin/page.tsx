@@ -5,14 +5,28 @@ import { usePoolState } from "@/lib/usePoolState";
 import { TeamResult, teamPoints } from "@/lib/scoring";
 import { TIER_MULTIPLIER } from "@/data/tournament";
 
+const PW_KEY = "wcpool_admin_pw"; // remembered for this browser session only
+
 export default function AdminPage() {
   const { state, refresh } = usePoolState(0); // no auto-poll while editing
+  const [unlocked, setUnlocked] = useState(false);
   const [password, setPassword] = useState("");
   const [rows, setRows] = useState<TeamResult[]>([]);
   const [players, setPlayers] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
+
+  // Restore a previously-verified password for this session so the admin
+  // doesn't have to retype it on every visit.
+  useEffect(() => {
+    const saved = sessionStorage.getItem(PW_KEY);
+    if (saved) {
+      setPassword(saved);
+      setUnlocked(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (state) {
@@ -21,10 +35,42 @@ export default function AdminPage() {
     }
   }, [state]);
 
+  function flash(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2000);
+  }
+
+  async function unlock() {
+    setUnlocking(true);
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, verify: true }),
+      });
+      if (res.ok) {
+        sessionStorage.setItem(PW_KEY, password);
+        setUnlocked(true);
+      } else if (res.status === 401) {
+        flash("Wrong password");
+      } else {
+        flash("Couldn’t verify — try again");
+      }
+    } catch {
+      flash("Couldn’t verify — try again");
+    } finally {
+      setUnlocking(false);
+    }
+  }
+
+  function lock() {
+    sessionStorage.removeItem(PW_KEY);
+    setPassword("");
+    setUnlocked(false);
+  }
+
   function update(team: string, patch: Partial<TeamResult>) {
-    setRows((prev) =>
-      prev.map((r) => (r.team === team ? { ...r, ...patch } : r))
-    );
+    setRows((prev) => prev.map((r) => (r.team === team ? { ...r, ...patch } : r)));
   }
 
   async function save() {
@@ -36,19 +82,54 @@ export default function AdminPage() {
         body: JSON.stringify({ password, results: rows, players }),
       });
       if (res.status === 401) {
-        setToast("Wrong password");
+        flash("Wrong password");
+        lock(); // password changed/invalid — send back to login
       } else if (!res.ok) {
-        setToast("Save failed");
+        flash("Save failed");
       } else {
-        setToast("Saved ✓");
+        flash("Saved ✓");
         refresh();
       }
     } finally {
       setSaving(false);
-      setTimeout(() => setToast(null), 2000);
     }
   }
 
+  // ---- Login gate: nothing else renders until the password is verified. ----
+  if (!unlocked) {
+    return (
+      <Shell>
+        <h1>Admin</h1>
+        <p className="sub">Enter the admin password to manage the pool.</p>
+        <div className="card">
+          <label>Admin password</label>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (password && !unlocking) unlock();
+            }}
+          >
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="password"
+              autoFocus
+              style={{ width: 240 }}
+            />
+            <div style={{ marginTop: 12 }}>
+              <button type="submit" disabled={!password || unlocking}>
+                {unlocking ? "Checking…" : "Unlock"}
+              </button>
+            </div>
+          </form>
+        </div>
+        {toast && <div className="toast">{toast}</div>}
+      </Shell>
+    );
+  }
+
+  // ---- Unlocked: full admin controls. ----
   if (!state) return <Shell><p className="muted">Loading…</p></Shell>;
 
   const shown = rows.filter((r) =>
@@ -57,22 +138,11 @@ export default function AdminPage() {
 
   return (
     <Shell>
-      <h1>Admin</h1>
-      <p className="sub">Assign teams after the draw, then tick results as matches finish.</p>
-
-      <div className="card">
-        <label>Admin password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="required to save"
-          style={{ width: 240 }}
-        />
-        <p className="muted" style={{ marginTop: 8 }}>
-          Set this via the <code>ADMIN_PASSWORD</code> environment variable. Default is <code>changeme</code>.
-        </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <h1>Admin</h1>
+        <button className="ghost" onClick={lock}>Lock</button>
       </div>
+      <p className="sub">Assign teams after the draw, then tick results as matches finish.</p>
 
       <h2>Player names</h2>
       <div className="card">
@@ -87,7 +157,7 @@ export default function AdminPage() {
             />
           </div>
         ))}
-        <p className="muted">Renaming here updates everywhere. Keep the count at 6.</p>
+        <p className="muted">Renaming here updates everywhere. Keep the count the same ({players.length}).</p>
       </div>
 
       <h2>Teams &amp; results</h2>
@@ -153,7 +223,7 @@ export default function AdminPage() {
       </div>
 
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-        <button onClick={save} disabled={saving || !password}>
+        <button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save changes"}
         </button>
         <button className="ghost" onClick={() => state && setRows(state.results)}>
