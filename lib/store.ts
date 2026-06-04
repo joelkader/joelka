@@ -17,7 +17,7 @@
 import fs from "fs";
 import path from "path";
 import { TEAMS, PLAYERS } from "@/data/tournament";
-import { TeamResult, emptyResult } from "@/lib/scoring";
+import { TeamResult, emptyResult, Match } from "@/lib/scoring";
 
 const STATE_PATH = path.join(process.cwd(), "data", "state.json");
 const BLOB_STORE = "wc-pool";
@@ -26,6 +26,7 @@ const BLOB_KEY = "state";
 export interface PoolState {
   results: TeamResult[];
   players: string[];
+  matches: Match[];
   lastUpdated: string; // ISO timestamp
 }
 
@@ -33,6 +34,7 @@ function seedState(): PoolState {
   return {
     results: TEAMS.map((t) => emptyResult(t.name, t.tier)),
     players: PLAYERS,
+    matches: [],
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -61,6 +63,9 @@ function heal(state: PoolState): PoolState {
   if (state.players.length !== PLAYERS.length) {
     state.players = [...PLAYERS];
   }
+
+  // Older saved state may predate the schedule feature.
+  if (!Array.isArray(state.matches)) state.matches = [];
 
   return state;
 }

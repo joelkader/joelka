@@ -3,7 +3,7 @@
 // Overwrites the stored results/players. Used by the admin panel.
 import { NextRequest, NextResponse } from "next/server";
 import { loadState, saveState } from "@/lib/store";
-import { TeamResult } from "@/lib/scoring";
+import { TeamResult, Match } from "@/lib/scoring";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +27,9 @@ export async function POST(req: NextRequest) {
   }
   if (Array.isArray(body.players)) {
     state.players = body.players as string[];
+  }
+  if (Array.isArray(body.matches)) {
+    state.matches = body.matches as Match[];
   }
 
   await saveState(state);

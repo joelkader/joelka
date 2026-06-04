@@ -24,6 +24,19 @@ export interface TeamResult {
   champion: boolean;
 }
 
+// A scheduled fixture. teamA/teamB are team names (see data/tournament.ts).
+// Scores are optional — null until the match is played. Owner-vs-owner is
+// derived from team ownership at render time, not stored here.
+export interface Match {
+  id: string;
+  round: string; // free text, e.g. "Group A", "R32", "Final"
+  date: string; // free text/ISO, e.g. "2026-06-11" or "Matchday 1"
+  teamA: string;
+  teamB: string;
+  scoreA: number | null;
+  scoreB: number | null;
+}
+
 export function emptyResult(team: string, tier: Tier): TeamResult {
   return {
     team,

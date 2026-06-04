@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
-import { TeamResult, teamPoints } from "@/lib/scoring";
-import { TIER_MULTIPLIER, flagFor } from "@/data/tournament";
+import { TeamResult, teamPoints, Match } from "@/lib/scoring";
+import { TIER_MULTIPLIER, flagFor, TEAMS } from "@/data/tournament";
 
 const PW_KEY = "wcpool_admin_pw"; // remembered for this browser session only
 
@@ -13,10 +13,13 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [rows, setRows] = useState<TeamResult[]>([]);
   const [players, setPlayers] = useState<string[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [saving, setSaving] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
+  // Draft for the "add match" form.
+  const [draft, setDraft] = useState({ round: "", date: "", teamA: "", teamB: "" });
 
   // Restore a previously-verified password for this session so the admin
   // doesn't have to retype it on every visit.
@@ -32,6 +35,7 @@ export default function AdminPage() {
     if (state) {
       setRows(state.results);
       setPlayers(state.players);
+      setMatches(state.matches ?? []);
     }
   }, [state]);
 
@@ -73,13 +77,46 @@ export default function AdminPage() {
     setRows((prev) => prev.map((r) => (r.team === team ? { ...r, ...patch } : r)));
   }
 
+  function addMatch() {
+    if (!draft.teamA || !draft.teamB || draft.teamA === draft.teamB) {
+      flash("Pick two different teams");
+      return;
+    }
+    const m: Match = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      round: draft.round.trim(),
+      date: draft.date.trim(),
+      teamA: draft.teamA,
+      teamB: draft.teamB,
+      scoreA: null,
+      scoreB: null,
+    };
+    setMatches((prev) => [...prev, m]);
+    setDraft({ round: "", date: "", teamA: "", teamB: "" });
+  }
+
+  function updateMatch(id: string, patch: Partial<Match>) {
+    setMatches((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
+  }
+
+  function removeMatch(id: string) {
+    setMatches((prev) => prev.filter((m) => m.id !== id));
+  }
+
+  // Parse a score input ("" -> null, else clamped non-negative integer).
+  function parseScore(v: string): number | null {
+    if (v.trim() === "") return null;
+    const n = Math.max(0, Math.floor(+v));
+    return isNaN(n) ? null : n;
+  }
+
   async function save() {
     setSaving(true);
     try {
       const res = await fetch("/api/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, results: rows, players }),
+        body: JSON.stringify({ password, results: rows, players, matches }),
       });
       if (res.status === 401) {
         flash("Wrong password");
@@ -139,7 +176,8 @@ export default function AdminPage() {
   // Unsaved-changes flag — drives the floating "Save" button in the corner.
   const dirty =
     JSON.stringify(rows) !== JSON.stringify(state.results) ||
-    JSON.stringify(players) !== JSON.stringify(state.players);
+    JSON.stringify(players) !== JSON.stringify(state.players) ||
+    JSON.stringify(matches) !== JSON.stringify(state.matches ?? []);
 
   return (
     <Shell>
@@ -227,11 +265,88 @@ export default function AdminPage() {
         ))}
       </div>
 
+      <h2>Schedule</h2>
+      <p className="muted" style={{ marginTop: -6, marginBottom: 10 }}>
+        Add fixtures (e.g. France vs Senegal). The public Schedule page shows the
+        owning players facing off; enter scores once a match is played.
+      </p>
+
+      {/* Add a match */}
+      <div className="card" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+        <input
+          placeholder="round (e.g. Group A)"
+          value={draft.round}
+          onChange={(e) => setDraft({ ...draft, round: e.target.value })}
+          style={{ width: 150 }}
+        />
+        <input
+          placeholder="date (e.g. Jun 11)"
+          value={draft.date}
+          onChange={(e) => setDraft({ ...draft, date: e.target.value })}
+          style={{ width: 130 }}
+        />
+        <select value={draft.teamA} onChange={(e) => setDraft({ ...draft, teamA: e.target.value })}>
+          <option value="">Team A…</option>
+          {TEAMS.map((t) => (
+            <option key={t.name} value={t.name}>{t.name}</option>
+          ))}
+        </select>
+        <span className="muted">vs</span>
+        <select value={draft.teamB} onChange={(e) => setDraft({ ...draft, teamB: e.target.value })}>
+          <option value="">Team B…</option>
+          {TEAMS.map((t) => (
+            <option key={t.name} value={t.name}>{t.name}</option>
+          ))}
+        </select>
+        <button onClick={addMatch}>Add match</button>
+      </div>
+
+      {/* Existing matches */}
+      {matches.length > 0 && (
+        <div className="card" style={{ padding: 0, marginTop: 10 }}>
+          {matches.map((m) => (
+            <div key={m.id} className="admin-match">
+              <span className="muted" style={{ minWidth: 120 }}>
+                {[m.round, m.date].filter(Boolean).join(" · ") || "—"}
+              </span>
+              <span style={{ flex: 1, textAlign: "right" }}>
+                <span className="team-flag">{flagFor(m.teamA)}</span> {m.teamA}
+              </span>
+              <input
+                type="number" min={0} placeholder="-"
+                value={m.scoreA ?? ""}
+                onChange={(e) => updateMatch(m.id, { scoreA: parseScore(e.target.value) })}
+                style={{ width: 44, textAlign: "center" }}
+              />
+              <span className="muted">–</span>
+              <input
+                type="number" min={0} placeholder="-"
+                value={m.scoreB ?? ""}
+                onChange={(e) => updateMatch(m.id, { scoreB: parseScore(e.target.value) })}
+                style={{ width: 44, textAlign: "center" }}
+              />
+              <span style={{ flex: 1 }}>
+                {m.teamB} <span className="team-flag">{flagFor(m.teamB)}</span>
+              </span>
+              <button className="ghost" onClick={() => removeMatch(m.id)} title="Remove">✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         <button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save changes"}
         </button>
-        <button className="ghost" onClick={() => state && setRows(state.results)}>
+        <button
+          className="ghost"
+          onClick={() => {
+            if (!state) return;
+            setRows(state.results);
+            setPlayers(state.players);
+            setMatches(state.matches ?? []);
+          }}
+        >
           Reset edits
         </button>
       </div>
