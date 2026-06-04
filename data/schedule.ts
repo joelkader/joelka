@@ -1,32 +1,41 @@
 // ============================================================================
-// SCHEDULE — default group-stage fixtures
+// SCHEDULE — official 2026 World Cup group-stage fixtures
 // ============================================================================
-// A full 12-group round-robin generated from the 48 teams in tournament.ts.
-// Teams are snake-distributed across groups A–L so each group is tier-balanced.
-// These are the default fixtures everyone sees; the admin can edit/remove them
-// or enter scores in the Admin panel. Knockout matches depend on results, so
-// add those by hand once the bracket is known.
+// The real Final Draw (5 Dec 2025): all 12 groups A–L, team order roughly by
+// seeding (pot 1 first). Fixtures are generated as the standard group
+// round-robin; rounds are labelled by Matchday (exact kickoff dates/venues can
+// be filled in per match in the Admin panel). Knockout matches depend on
+// results, so add those by hand once the bracket is known.
 //
-// IDs are stable so re-deploys merge cleanly without duplicating or wiping
+// Team names match data/tournament.ts (South Korea = "Korea Republic",
+// Côte d'Ivoire = "Ivory Coast", Cabo Verde = "Cape Verde").
+//
+// IDs are stable so re-deploys reconcile cleanly without duplicating or wiping
 // admin-entered scores (see lib/store.ts heal()).
 // ============================================================================
 
 import type { Match } from "@/lib/scoring";
-import { TEAMS } from "./tournament";
 
 const GROUP_LETTERS = "ABCDEFGHIJKL".split(""); // 12 groups
 
-// Snake-distribute the 48 teams into 12 groups of 4 for a balanced spread.
+// Official groups, in seeding order (pot 1 → pot 4).
+const OFFICIAL_GROUPS: string[][] = [
+  ["Mexico", "South Africa", "South Korea", "Czechia"],          // A
+  ["Canada", "Switzerland", "Bosnia and Herzegovina", "Qatar"],  // B
+  ["Brazil", "Morocco", "Haiti", "Scotland"],                    // C
+  ["United States", "Paraguay", "Australia", "Türkiye"],         // D
+  ["Germany", "Ecuador", "Côte d'Ivoire", "Curaçao"],            // E
+  ["Netherlands", "Japan", "Sweden", "Tunisia"],                 // F
+  ["Belgium", "Egypt", "Iran", "New Zealand"],                   // G
+  ["Spain", "Uruguay", "Saudi Arabia", "Cabo Verde"],            // H
+  ["France", "Senegal", "Norway", "Iraq"],                       // I
+  ["Argentina", "Austria", "Algeria", "Jordan"],                 // J
+  ["Portugal", "Colombia", "Uzbekistan", "DR Congo"],            // K
+  ["England", "Croatia", "Ghana", "Panama"],                     // L
+];
+
 function buildGroups(): string[][] {
-  const names = TEAMS.map((t) => t.name);
-  const groups: string[][] = GROUP_LETTERS.map(() => []);
-  names.forEach((name, i) => {
-    const round = Math.floor(i / 12);
-    const pos = i % 12;
-    const g = round % 2 === 0 ? pos : 11 - pos; // snake
-    groups[g].push(name);
-  });
-  return groups;
+  return OFFICIAL_GROUPS;
 }
 
 // Round-robin pairings for a 4-team group, by matchday.

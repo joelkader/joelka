@@ -68,13 +68,26 @@ function heal(state: PoolState): PoolState {
   // Older saved state may predate the schedule feature.
   if (!Array.isArray(state.matches)) state.matches = [];
 
-  // Add any default fixtures that aren't present yet (matched by id), keeping
-  // any admin-entered scores on existing ones. Lets the pre-built schedule
-  // reach an already-seeded store without duplicating or wiping edits.
-  const haveIds = new Set(state.matches.map((m) => m.id));
+  // Reconcile the built-in fixtures (ids prefixed "grp-") against the official
+  // schedule: update teams/round/date from the data file but keep any
+  // admin-entered scores, add missing ones, and drop stale built-ins. Matches
+  // the admin added by hand (other id prefixes) are left untouched.
+  const defaultById = new Map(DEFAULT_MATCHES.map((m) => [m.id, m]));
+  const byId = new Map(state.matches.map((m) => [m.id, m]));
   for (const dm of DEFAULT_MATCHES) {
-    if (!haveIds.has(dm.id)) state.matches.push({ ...dm });
+    const ex = byId.get(dm.id);
+    if (ex) {
+      ex.teamA = dm.teamA;
+      ex.teamB = dm.teamB;
+      ex.round = dm.round;
+      ex.date = dm.date;
+    } else {
+      state.matches.push({ ...dm });
+    }
   }
+  state.matches = state.matches.filter(
+    (m) => !m.id.startsWith("grp-") || defaultById.has(m.id)
+  );
 
   return state;
 }
