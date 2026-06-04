@@ -1,71 +1,120 @@
 // ============================================================================
-// SCHEDULE — official 2026 World Cup group-stage fixtures
+// SCHEDULE — official 2026 FIFA World Cup match schedule (with dates & venues)
 // ============================================================================
-// The real Final Draw (5 Dec 2025): all 12 groups A–L, team order roughly by
-// seeding (pot 1 first). Fixtures are generated as the standard group
-// round-robin; rounds are labelled by Matchday (exact kickoff dates/venues can
-// be filled in per match in the Admin panel). Knockout matches depend on
-// results, so add those by hand once the bracket is known.
+// Generated from the official FIFA match schedule workbook. All 104 matches:
+// 72 group fixtures (real teams) + 32 knockout slots (placeholder labels like
+// "Winner A" / "Runner-up B" / "Winner M74" until the bracket resolves).
+// Dates are local to the host venue. Team names match data/tournament.ts.
 //
-// Team names match data/tournament.ts (South Korea = "Korea Republic",
-// Côte d'Ivoire = "Ivory Coast", Cabo Verde = "Cape Verde").
-//
-// IDs are stable so re-deploys reconcile cleanly without duplicating or wiping
-// admin-entered scores (see lib/store.ts heal()).
+// IDs are stable ("wc-<matchNo>") so re-deploys reconcile cleanly without
+// duplicating or wiping admin-entered scores (see lib/store.ts heal()).
 // ============================================================================
 
 import type { Match } from "@/lib/scoring";
 
-const GROUP_LETTERS = "ABCDEFGHIJKL".split(""); // 12 groups
-
-// Official groups, in seeding order (pot 1 → pot 4).
-const OFFICIAL_GROUPS: string[][] = [
-  ["Mexico", "South Africa", "South Korea", "Czechia"],          // A
-  ["Canada", "Switzerland", "Bosnia and Herzegovina", "Qatar"],  // B
-  ["Brazil", "Morocco", "Haiti", "Scotland"],                    // C
-  ["United States", "Paraguay", "Australia", "Türkiye"],         // D
-  ["Germany", "Ecuador", "Côte d'Ivoire", "Curaçao"],            // E
-  ["Netherlands", "Japan", "Sweden", "Tunisia"],                 // F
-  ["Belgium", "Egypt", "Iran", "New Zealand"],                   // G
-  ["Spain", "Uruguay", "Saudi Arabia", "Cabo Verde"],            // H
-  ["France", "Senegal", "Norway", "Iraq"],                       // I
-  ["Argentina", "Austria", "Algeria", "Jordan"],                 // J
-  ["Portugal", "Colombia", "Uzbekistan", "DR Congo"],            // K
-  ["England", "Croatia", "Ghana", "Panama"],                     // L
+export const DEFAULT_MATCHES: Match[] = [
+  { id: "wc-1", round: "Group A", date: "Thu 11 Jun · 15:00", venue: "Mexico City", teamA: "Mexico", teamB: "South Africa", scoreA: null, scoreB: null },
+  { id: "wc-2", round: "Group A", date: "Thu 11 Jun · 22:00", venue: "Guadalajara", teamA: "South Korea", teamB: "Czechia", scoreA: null, scoreB: null },
+  { id: "wc-3", round: "Group B", date: "Fri 12 Jun · 15:00", venue: "Toronto", teamA: "Canada", teamB: "Bosnia and Herzegovina", scoreA: null, scoreB: null },
+  { id: "wc-4", round: "Group D", date: "Fri 12 Jun · 21:00", venue: "Los Angeles", teamA: "United States", teamB: "Paraguay", scoreA: null, scoreB: null },
+  { id: "wc-5", round: "Group C", date: "Sat 13 Jun · 21:00", venue: "Boston", teamA: "Haiti", teamB: "Scotland", scoreA: null, scoreB: null },
+  { id: "wc-6", round: "Group D", date: "Sun 14 Jun · 00:00", venue: "Vancouver", teamA: "Australia", teamB: "Türkiye", scoreA: null, scoreB: null },
+  { id: "wc-7", round: "Group C", date: "Sat 13 Jun · 18:00", venue: "New York/New Jersey", teamA: "Brazil", teamB: "Morocco", scoreA: null, scoreB: null },
+  { id: "wc-8", round: "Group B", date: "Sat 13 Jun · 15:00", venue: "San Francisco Bay Area", teamA: "Qatar", teamB: "Switzerland", scoreA: null, scoreB: null },
+  { id: "wc-9", round: "Group E", date: "Sun 14 Jun · 19:00", venue: "Philadelphia", teamA: "Côte d'Ivoire", teamB: "Ecuador", scoreA: null, scoreB: null },
+  { id: "wc-10", round: "Group E", date: "Sun 14 Jun · 13:00", venue: "Houston", teamA: "Germany", teamB: "Curaçao", scoreA: null, scoreB: null },
+  { id: "wc-11", round: "Group F", date: "Sun 14 Jun · 16:00", venue: "Dallas", teamA: "Netherlands", teamB: "Japan", scoreA: null, scoreB: null },
+  { id: "wc-12", round: "Group F", date: "Sun 14 Jun · 22:00", venue: "Monterrey", teamA: "Sweden", teamB: "Tunisia", scoreA: null, scoreB: null },
+  { id: "wc-13", round: "Group H", date: "Mon 15 Jun · 18:00", venue: "Miami", teamA: "Saudi Arabia", teamB: "Uruguay", scoreA: null, scoreB: null },
+  { id: "wc-14", round: "Group H", date: "Mon 15 Jun · 12:00", venue: "Atlanta", teamA: "Spain", teamB: "Cabo Verde", scoreA: null, scoreB: null },
+  { id: "wc-15", round: "Group G", date: "Mon 15 Jun · 21:00", venue: "Los Angeles", teamA: "Iran", teamB: "New Zealand", scoreA: null, scoreB: null },
+  { id: "wc-16", round: "Group G", date: "Mon 15 Jun · 15:00", venue: "Seattle", teamA: "Belgium", teamB: "Egypt", scoreA: null, scoreB: null },
+  { id: "wc-17", round: "Group I", date: "Tue 16 Jun · 15:00", venue: "New York/New Jersey", teamA: "France", teamB: "Senegal", scoreA: null, scoreB: null },
+  { id: "wc-18", round: "Group I", date: "Tue 16 Jun · 18:00", venue: "Boston", teamA: "Iraq", teamB: "Norway", scoreA: null, scoreB: null },
+  { id: "wc-19", round: "Group J", date: "Tue 16 Jun · 21:00", venue: "Kansas City", teamA: "Argentina", teamB: "Algeria", scoreA: null, scoreB: null },
+  { id: "wc-20", round: "Group J", date: "Wed 17 Jun · 00:00", venue: "San Francisco Bay Area", teamA: "Austria", teamB: "Jordan", scoreA: null, scoreB: null },
+  { id: "wc-21", round: "Group L", date: "Wed 17 Jun · 19:00", venue: "Toronto", teamA: "Ghana", teamB: "Panama", scoreA: null, scoreB: null },
+  { id: "wc-22", round: "Group L", date: "Wed 17 Jun · 16:00", venue: "Dallas", teamA: "England", teamB: "Croatia", scoreA: null, scoreB: null },
+  { id: "wc-23", round: "Group K", date: "Wed 17 Jun · 13:00", venue: "Houston", teamA: "Portugal", teamB: "DR Congo", scoreA: null, scoreB: null },
+  { id: "wc-24", round: "Group K", date: "Wed 17 Jun · 22:00", venue: "Mexico City", teamA: "Uzbekistan", teamB: "Colombia", scoreA: null, scoreB: null },
+  { id: "wc-25", round: "Group A", date: "Thu 18 Jun · 12:00", venue: "Atlanta", teamA: "Czechia", teamB: "South Africa", scoreA: null, scoreB: null },
+  { id: "wc-26", round: "Group B", date: "Thu 18 Jun · 15:00", venue: "Los Angeles", teamA: "Switzerland", teamB: "Bosnia and Herzegovina", scoreA: null, scoreB: null },
+  { id: "wc-27", round: "Group B", date: "Thu 18 Jun · 18:00", venue: "Vancouver", teamA: "Canada", teamB: "Qatar", scoreA: null, scoreB: null },
+  { id: "wc-28", round: "Group A", date: "Thu 18 Jun · 21:00", venue: "Guadalajara", teamA: "Mexico", teamB: "South Korea", scoreA: null, scoreB: null },
+  { id: "wc-29", round: "Group C", date: "Fri 19 Jun · 20:30", venue: "Philadelphia", teamA: "Brazil", teamB: "Haiti", scoreA: null, scoreB: null },
+  { id: "wc-30", round: "Group C", date: "Fri 19 Jun · 18:00", venue: "Boston", teamA: "Scotland", teamB: "Morocco", scoreA: null, scoreB: null },
+  { id: "wc-31", round: "Group D", date: "Fri 19 Jun · 23:00", venue: "San Francisco Bay Area", teamA: "Türkiye", teamB: "Paraguay", scoreA: null, scoreB: null },
+  { id: "wc-32", round: "Group D", date: "Fri 19 Jun · 15:00", venue: "Seattle", teamA: "United States", teamB: "Australia", scoreA: null, scoreB: null },
+  { id: "wc-33", round: "Group E", date: "Sat 20 Jun · 16:00", venue: "Toronto", teamA: "Germany", teamB: "Côte d'Ivoire", scoreA: null, scoreB: null },
+  { id: "wc-34", round: "Group E", date: "Sat 20 Jun · 20:00", venue: "Kansas City", teamA: "Ecuador", teamB: "Curaçao", scoreA: null, scoreB: null },
+  { id: "wc-35", round: "Group F", date: "Sat 20 Jun · 13:00", venue: "Houston", teamA: "Netherlands", teamB: "Sweden", scoreA: null, scoreB: null },
+  { id: "wc-36", round: "Group F", date: "Sun 21 Jun · 00:00", venue: "Monterrey", teamA: "Tunisia", teamB: "Japan", scoreA: null, scoreB: null },
+  { id: "wc-37", round: "Group H", date: "Sun 21 Jun · 18:00", venue: "Miami", teamA: "Uruguay", teamB: "Cabo Verde", scoreA: null, scoreB: null },
+  { id: "wc-38", round: "Group H", date: "Sun 21 Jun · 12:00", venue: "Atlanta", teamA: "Spain", teamB: "Saudi Arabia", scoreA: null, scoreB: null },
+  { id: "wc-39", round: "Group G", date: "Sun 21 Jun · 15:00", venue: "Los Angeles", teamA: "Belgium", teamB: "Iran", scoreA: null, scoreB: null },
+  { id: "wc-40", round: "Group G", date: "Sun 21 Jun · 21:00", venue: "Vancouver", teamA: "New Zealand", teamB: "Egypt", scoreA: null, scoreB: null },
+  { id: "wc-41", round: "Group I", date: "Mon 22 Jun · 20:00", venue: "New York/New Jersey", teamA: "Norway", teamB: "Senegal", scoreA: null, scoreB: null },
+  { id: "wc-42", round: "Group I", date: "Mon 22 Jun · 17:00", venue: "Philadelphia", teamA: "France", teamB: "Iraq", scoreA: null, scoreB: null },
+  { id: "wc-43", round: "Group J", date: "Mon 22 Jun · 13:00", venue: "Dallas", teamA: "Argentina", teamB: "Austria", scoreA: null, scoreB: null },
+  { id: "wc-44", round: "Group J", date: "Mon 22 Jun · 23:00", venue: "San Francisco Bay Area", teamA: "Jordan", teamB: "Algeria", scoreA: null, scoreB: null },
+  { id: "wc-45", round: "Group L", date: "Tue 23 Jun · 16:00", venue: "Boston", teamA: "England", teamB: "Ghana", scoreA: null, scoreB: null },
+  { id: "wc-46", round: "Group L", date: "Tue 23 Jun · 19:00", venue: "Toronto", teamA: "Panama", teamB: "Croatia", scoreA: null, scoreB: null },
+  { id: "wc-47", round: "Group K", date: "Tue 23 Jun · 13:00", venue: "Houston", teamA: "Portugal", teamB: "Uzbekistan", scoreA: null, scoreB: null },
+  { id: "wc-48", round: "Group K", date: "Tue 23 Jun · 22:00", venue: "Guadalajara", teamA: "Colombia", teamB: "DR Congo", scoreA: null, scoreB: null },
+  { id: "wc-49", round: "Group C", date: "Wed 24 Jun · 18:00", venue: "Miami", teamA: "Scotland", teamB: "Brazil", scoreA: null, scoreB: null },
+  { id: "wc-50", round: "Group C", date: "Wed 24 Jun · 18:00", venue: "Atlanta", teamA: "Morocco", teamB: "Haiti", scoreA: null, scoreB: null },
+  { id: "wc-51", round: "Group B", date: "Wed 24 Jun · 15:00", venue: "Vancouver", teamA: "Switzerland", teamB: "Canada", scoreA: null, scoreB: null },
+  { id: "wc-52", round: "Group B", date: "Wed 24 Jun · 15:00", venue: "Seattle", teamA: "Bosnia and Herzegovina", teamB: "Qatar", scoreA: null, scoreB: null },
+  { id: "wc-53", round: "Group A", date: "Wed 24 Jun · 21:00", venue: "Mexico City", teamA: "Czechia", teamB: "Mexico", scoreA: null, scoreB: null },
+  { id: "wc-54", round: "Group A", date: "Wed 24 Jun · 21:00", venue: "Monterrey", teamA: "South Africa", teamB: "South Korea", scoreA: null, scoreB: null },
+  { id: "wc-55", round: "Group E", date: "Thu 25 Jun · 16:00", venue: "Philadelphia", teamA: "Curaçao", teamB: "Côte d'Ivoire", scoreA: null, scoreB: null },
+  { id: "wc-56", round: "Group E", date: "Thu 25 Jun · 16:00", venue: "New York/New Jersey", teamA: "Ecuador", teamB: "Germany", scoreA: null, scoreB: null },
+  { id: "wc-57", round: "Group F", date: "Thu 25 Jun · 19:00", venue: "Dallas", teamA: "Japan", teamB: "Sweden", scoreA: null, scoreB: null },
+  { id: "wc-58", round: "Group F", date: "Thu 25 Jun · 19:00", venue: "Kansas City", teamA: "Tunisia", teamB: "Netherlands", scoreA: null, scoreB: null },
+  { id: "wc-59", round: "Group D", date: "Thu 25 Jun · 22:00", venue: "Los Angeles", teamA: "Türkiye", teamB: "United States", scoreA: null, scoreB: null },
+  { id: "wc-60", round: "Group D", date: "Thu 25 Jun · 22:00", venue: "San Francisco Bay Area", teamA: "Paraguay", teamB: "Australia", scoreA: null, scoreB: null },
+  { id: "wc-61", round: "Group I", date: "Fri 26 Jun · 15:00", venue: "Boston", teamA: "Norway", teamB: "France", scoreA: null, scoreB: null },
+  { id: "wc-62", round: "Group I", date: "Fri 26 Jun · 15:00", venue: "Toronto", teamA: "Senegal", teamB: "Iraq", scoreA: null, scoreB: null },
+  { id: "wc-63", round: "Group G", date: "Fri 26 Jun · 23:00", venue: "Seattle", teamA: "Egypt", teamB: "Iran", scoreA: null, scoreB: null },
+  { id: "wc-64", round: "Group G", date: "Fri 26 Jun · 23:00", venue: "Vancouver", teamA: "New Zealand", teamB: "Belgium", scoreA: null, scoreB: null },
+  { id: "wc-65", round: "Group H", date: "Fri 26 Jun · 20:00", venue: "Houston", teamA: "Cabo Verde", teamB: "Saudi Arabia", scoreA: null, scoreB: null },
+  { id: "wc-66", round: "Group H", date: "Fri 26 Jun · 20:00", venue: "Guadalajara", teamA: "Uruguay", teamB: "Spain", scoreA: null, scoreB: null },
+  { id: "wc-67", round: "Group L", date: "Sat 27 Jun · 17:00", venue: "New York/New Jersey", teamA: "Panama", teamB: "England", scoreA: null, scoreB: null },
+  { id: "wc-68", round: "Group L", date: "Sat 27 Jun · 17:00", venue: "Philadelphia", teamA: "Croatia", teamB: "Ghana", scoreA: null, scoreB: null },
+  { id: "wc-69", round: "Group J", date: "Sat 27 Jun · 22:00", venue: "Kansas City", teamA: "Algeria", teamB: "Austria", scoreA: null, scoreB: null },
+  { id: "wc-70", round: "Group J", date: "Sat 27 Jun · 22:00", venue: "Dallas", teamA: "Jordan", teamB: "Argentina", scoreA: null, scoreB: null },
+  { id: "wc-71", round: "Group K", date: "Sat 27 Jun · 19:30", venue: "Miami", teamA: "Colombia", teamB: "Portugal", scoreA: null, scoreB: null },
+  { id: "wc-72", round: "Group K", date: "Sat 27 Jun · 19:30", venue: "Atlanta", teamA: "DR Congo", teamB: "Uzbekistan", scoreA: null, scoreB: null },
+  { id: "wc-73", round: "Round of 32", date: "Sun 28 Jun · 15:00", venue: "Los Angeles", teamA: "Runner-up A", teamB: "Runner-up B", scoreA: null, scoreB: null },
+  { id: "wc-74", round: "Round of 32", date: "Mon 29 Jun · 16:30", venue: "Boston", teamA: "Winner E", teamB: "3rd: A/B/C/D/F", scoreA: null, scoreB: null },
+  { id: "wc-75", round: "Round of 32", date: "Mon 29 Jun · 21:00", venue: "Monterrey", teamA: "Winner F", teamB: "Runner-up C", scoreA: null, scoreB: null },
+  { id: "wc-76", round: "Round of 32", date: "Mon 29 Jun · 13:00", venue: "Houston", teamA: "Winner C", teamB: "Runner-up F", scoreA: null, scoreB: null },
+  { id: "wc-77", round: "Round of 32", date: "Tue 30 Jun · 17:00", venue: "New York/New Jersey", teamA: "Winner I", teamB: "3rd: C/D/F/G/H", scoreA: null, scoreB: null },
+  { id: "wc-78", round: "Round of 32", date: "Tue 30 Jun · 13:00", venue: "Dallas", teamA: "Runner-up E", teamB: "Runner-up I", scoreA: null, scoreB: null },
+  { id: "wc-79", round: "Round of 32", date: "Tue 30 Jun · 21:00", venue: "Mexico City", teamA: "Winner A", teamB: "3rd: C/E/F/H/I", scoreA: null, scoreB: null },
+  { id: "wc-80", round: "Round of 32", date: "Wed 1 Jul · 12:00", venue: "Atlanta", teamA: "Winner L", teamB: "3rd: E/H/I/J/K", scoreA: null, scoreB: null },
+  { id: "wc-81", round: "Round of 32", date: "Wed 1 Jul · 20:00", venue: "San Francisco Bay Area", teamA: "Winner D", teamB: "3rd: B/E/F/I/J", scoreA: null, scoreB: null },
+  { id: "wc-82", round: "Round of 32", date: "Wed 1 Jul · 16:00", venue: "Seattle", teamA: "Winner G", teamB: "3rd: A/E/H/I/J", scoreA: null, scoreB: null },
+  { id: "wc-83", round: "Round of 32", date: "Thu 2 Jul · 19:00", venue: "Toronto", teamA: "Runner-up K", teamB: "Runner-up L", scoreA: null, scoreB: null },
+  { id: "wc-84", round: "Round of 32", date: "Thu 2 Jul · 15:00", venue: "Los Angeles", teamA: "Winner H", teamB: "Runner-up J", scoreA: null, scoreB: null },
+  { id: "wc-85", round: "Round of 32", date: "Thu 2 Jul · 23:00", venue: "Vancouver", teamA: "Winner B", teamB: "3rd: E/F/G/I/J", scoreA: null, scoreB: null },
+  { id: "wc-86", round: "Round of 32", date: "Fri 3 Jul · 18:00", venue: "Miami", teamA: "Winner J", teamB: "Runner-up H", scoreA: null, scoreB: null },
+  { id: "wc-87", round: "Round of 32", date: "Fri 3 Jul · 21:30", venue: "Kansas City", teamA: "Winner K", teamB: "3rd: D/E/I/J/L", scoreA: null, scoreB: null },
+  { id: "wc-88", round: "Round of 32", date: "Fri 3 Jul · 14:00", venue: "Dallas", teamA: "Runner-up D", teamB: "Runner-up G", scoreA: null, scoreB: null },
+  { id: "wc-89", round: "Round of 16", date: "Sat 4 Jul · 17:00", venue: "Philadelphia", teamA: "Winner M74", teamB: "Winner M77", scoreA: null, scoreB: null },
+  { id: "wc-90", round: "Round of 16", date: "Sat 4 Jul · 13:00", venue: "Houston", teamA: "Winner M73", teamB: "Winner M75", scoreA: null, scoreB: null },
+  { id: "wc-91", round: "Round of 16", date: "Sun 5 Jul · 16:00", venue: "New York/New Jersey", teamA: "Winner M76", teamB: "Winner M78", scoreA: null, scoreB: null },
+  { id: "wc-92", round: "Round of 16", date: "Sun 5 Jul · 20:00", venue: "Mexico City", teamA: "Winner M79", teamB: "Winner M80", scoreA: null, scoreB: null },
+  { id: "wc-93", round: "Round of 16", date: "Mon 6 Jul · 15:00", venue: "Dallas", teamA: "Winner M83", teamB: "Winner M84", scoreA: null, scoreB: null },
+  { id: "wc-94", round: "Round of 16", date: "Mon 6 Jul · 20:00", venue: "Seattle", teamA: "Winner M81", teamB: "Winner M82", scoreA: null, scoreB: null },
+  { id: "wc-95", round: "Round of 16", date: "Tue 7 Jul · 12:00", venue: "Atlanta", teamA: "Winner M86", teamB: "Winner M88", scoreA: null, scoreB: null },
+  { id: "wc-96", round: "Round of 16", date: "Tue 7 Jul · 16:00", venue: "Vancouver", teamA: "Winner M85", teamB: "Winner M87", scoreA: null, scoreB: null },
+  { id: "wc-97", round: "Quarter-final", date: "Thu 9 Jul · 16:00", venue: "Boston", teamA: "Winner M89", teamB: "Winner M90", scoreA: null, scoreB: null },
+  { id: "wc-98", round: "Quarter-final", date: "Fri 10 Jul · 15:00", venue: "Los Angeles", teamA: "Winner M93", teamB: "Winner M94", scoreA: null, scoreB: null },
+  { id: "wc-99", round: "Quarter-final", date: "Sat 11 Jul · 17:00", venue: "Miami", teamA: "Winner M91", teamB: "Winner M92", scoreA: null, scoreB: null },
+  { id: "wc-100", round: "Quarter-final", date: "Sat 11 Jul · 21:00", venue: "Kansas City", teamA: "Winner M95", teamB: "Winner M96", scoreA: null, scoreB: null },
+  { id: "wc-101", round: "Semi-final", date: "Tue 14 Jul · 15:00", venue: "Dallas", teamA: "Winner M97", teamB: "Winner M98", scoreA: null, scoreB: null },
+  { id: "wc-102", round: "Semi-final", date: "Wed 15 Jul · 15:00", venue: "Atlanta", teamA: "Winner M99", teamB: "Winner M100", scoreA: null, scoreB: null },
+  { id: "wc-103", round: "Third place", date: "Sat 18 Jul · 17:00", venue: "Miami", teamA: "Runner-up M101", teamB: "Runner-up M102", scoreA: null, scoreB: null },
+  { id: "wc-104", round: "Final", date: "Sun 19 Jul · 15:00", venue: "New York/New Jersey", teamA: "Winner M101", teamB: "Winner M102", scoreA: null, scoreB: null },
 ];
-
-function buildGroups(): string[][] {
-  return OFFICIAL_GROUPS;
-}
-
-// Round-robin pairings for a 4-team group, by matchday.
-const ROUND_ROBIN: [number, number][][] = [
-  [[0, 1], [2, 3]], // Matchday 1
-  [[0, 2], [1, 3]], // Matchday 2
-  [[0, 3], [1, 2]], // Matchday 3
-];
-
-function buildDefaultMatches(): Match[] {
-  const groups = buildGroups();
-  const matches: Match[] = [];
-  groups.forEach((teams, gi) => {
-    const letter = GROUP_LETTERS[gi];
-    ROUND_ROBIN.forEach((pairs, md) => {
-      pairs.forEach(([a, b], pi) => {
-        if (!teams[a] || !teams[b]) return;
-        matches.push({
-          id: `grp-${letter}-md${md + 1}-${pi}`,
-          round: `Group ${letter}`,
-          date: `Matchday ${md + 1}`,
-          teamA: teams[a],
-          teamB: teams[b],
-          scoreA: null,
-          scoreB: null,
-        });
-      });
-    });
-  });
-  return matches;
-}
-
-export const DEFAULT_MATCHES: Match[] = buildDefaultMatches();

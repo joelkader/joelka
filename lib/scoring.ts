@@ -29,8 +29,9 @@ export interface TeamResult {
 // derived from team ownership at render time, not stored here.
 export interface Match {
   id: string;
-  round: string; // free text, e.g. "Group A", "R32", "Final"
-  date: string; // free text/ISO, e.g. "2026-06-11" or "Matchday 1"
+  round: string; // free text, e.g. "Group A", "Round of 32", "Final"
+  date: string; // free text/ISO, e.g. "Sat 13 Jun · 18:00"
+  venue?: string; // host city (optional)
   teamA: string;
   teamB: string;
   scoreA: number | null;

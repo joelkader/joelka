@@ -77,16 +77,21 @@ function heal(state: PoolState): PoolState {
   for (const dm of DEFAULT_MATCHES) {
     const ex = byId.get(dm.id);
     if (ex) {
+      // Keep admin-entered scores; refresh the fixture details from the file.
       ex.teamA = dm.teamA;
       ex.teamB = dm.teamB;
       ex.round = dm.round;
       ex.date = dm.date;
+      ex.venue = dm.venue;
     } else {
       state.matches.push({ ...dm });
     }
   }
+  // Drop stale built-in fixtures (ids prefixed "wc-"/"grp-") no longer in the
+  // file; leave admin-added matches (other id shapes) untouched.
+  const isBuiltIn = (id: string) => id.startsWith("wc-") || id.startsWith("grp-");
   state.matches = state.matches.filter(
-    (m) => !m.id.startsWith("grp-") || defaultById.has(m.id)
+    (m) => !isBuiltIn(m.id) || defaultById.has(m.id)
   );
 
   return state;
