@@ -21,6 +21,9 @@ export function usePoolState(pollMs = 60_000) {
 
   useEffect(() => {
     refresh();
+    // pollMs <= 0 means "fetch once, no polling" (used by the admin editor so
+    // it doesn't overwrite in-progress edits).
+    if (pollMs <= 0) return;
     const id = setInterval(refresh, pollMs);
     return () => clearInterval(id);
   }, [refresh, pollMs]);

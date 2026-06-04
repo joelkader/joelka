@@ -136,6 +136,11 @@ export default function AdminPage() {
     r.team.toLowerCase().includes(filter.toLowerCase())
   );
 
+  // Unsaved-changes flag — drives the floating "Save" button in the corner.
+  const dirty =
+    JSON.stringify(rows) !== JSON.stringify(state.results) ||
+    JSON.stringify(players) !== JSON.stringify(state.players);
+
   return (
     <Shell>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
@@ -233,6 +238,14 @@ export default function AdminPage() {
       <p className="muted" style={{ marginTop: 8 }}>
         Tip: tick achievements cumulatively. A team in the QF should have R32, R16 and QF all checked.
       </p>
+
+      {/* Floating save button — appears in the corner once you've made a change. */}
+      {dirty && (
+        <button className="save-fab" onClick={save} disabled={saving}>
+          <span className="dot" />
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+      )}
 
       {toast && <div className="toast">{toast}</div>}
     </Shell>
