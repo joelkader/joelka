@@ -17,6 +17,7 @@
 import fs from "fs";
 import path from "path";
 import { TEAMS, PLAYERS } from "@/data/tournament";
+import { DEFAULT_MATCHES } from "@/data/schedule";
 import { TeamResult, emptyResult, Match } from "@/lib/scoring";
 
 const STATE_PATH = path.join(process.cwd(), "data", "state.json");
@@ -34,7 +35,7 @@ function seedState(): PoolState {
   return {
     results: TEAMS.map((t) => emptyResult(t.name, t.tier)),
     players: PLAYERS,
-    matches: [],
+    matches: DEFAULT_MATCHES.map((m) => ({ ...m })),
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -66,6 +67,14 @@ function heal(state: PoolState): PoolState {
 
   // Older saved state may predate the schedule feature.
   if (!Array.isArray(state.matches)) state.matches = [];
+
+  // Add any default fixtures that aren't present yet (matched by id), keeping
+  // any admin-entered scores on existing ones. Lets the pre-built schedule
+  // reach an already-seeded store without duplicating or wiping edits.
+  const haveIds = new Set(state.matches.map((m) => m.id));
+  for (const dm of DEFAULT_MATCHES) {
+    if (!haveIds.has(dm.id)) state.matches.push({ ...dm });
+  }
 
   return state;
 }

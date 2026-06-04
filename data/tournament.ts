@@ -82,25 +82,28 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "New Zealand", tier: "Longshot" },
 ];
 
-// Emoji flag per team (display only). Falls back to a neutral flag if missing.
-export const FLAGS: Record<string, string> = {
-  Spain: "🇪🇸", France: "🇫🇷", England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Brazil: "🇧🇷",
-  Argentina: "🇦🇷", Portugal: "🇵🇹", Germany: "🇩🇪", Netherlands: "🇳🇱",
-  Belgium: "🇧🇪", Croatia: "🇭🇷", Uruguay: "🇺🇾", Morocco: "🇲🇦",
-  Switzerland: "🇨🇭", Colombia: "🇨🇴", "United States": "🇺🇸", Mexico: "🇲🇽",
-  Japan: "🇯🇵", Senegal: "🇸🇳", Ecuador: "🇪🇨", "South Korea": "🇰🇷",
-  Norway: "🇳🇴", Sweden: "🇸🇪", Austria: "🇦🇹", "Türkiye": "🇹🇷",
-  Iran: "🇮🇷", Egypt: "🇪🇬", Australia: "🇦🇺", Paraguay: "🇵🇾",
-  "Côte d'Ivoire": "🇨🇮", Algeria: "🇩🇿", Ghana: "🇬🇭", Czechia: "🇨🇿",
-  Tunisia: "🇹🇳", Scotland: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", Qatar: "🇶🇦", "Saudi Arabia": "🇸🇦",
-  Iraq: "🇮🇶", Uzbekistan: "🇺🇿", Panama: "🇵🇦", Canada: "🇨🇦",
-  "South Africa": "🇿🇦", "Bosnia and Herzegovina": "🇧🇦", "DR Congo": "🇨🇩",
-  "Cabo Verde": "🇨🇻", Haiti: "🇭🇹", Jordan: "🇯🇴", "Curaçao": "🇨🇼",
-  "New Zealand": "🇳🇿",
+// ISO 3166-1 alpha-2 codes (and FIFA subdivisions) per team, used to render
+// real flag images via flagcdn.com. Emoji flags don't render on many browsers
+// (e.g. Windows), so we use images instead.
+export const FLAG_CODES: Record<string, string> = {
+  Spain: "es", France: "fr", England: "gb-eng", Brazil: "br",
+  Argentina: "ar", Portugal: "pt", Germany: "de", Netherlands: "nl",
+  Belgium: "be", Croatia: "hr", Uruguay: "uy", Morocco: "ma",
+  Switzerland: "ch", Colombia: "co", "United States": "us", Mexico: "mx",
+  Japan: "jp", Senegal: "sn", Ecuador: "ec", "South Korea": "kr",
+  Norway: "no", Sweden: "se", Austria: "at", "Türkiye": "tr",
+  Iran: "ir", Egypt: "eg", Australia: "au", Paraguay: "py",
+  "Côte d'Ivoire": "ci", Algeria: "dz", Ghana: "gh", Czechia: "cz",
+  Tunisia: "tn", Scotland: "gb-sct", Qatar: "qa", "Saudi Arabia": "sa",
+  Iraq: "iq", Uzbekistan: "uz", Panama: "pa", Canada: "ca",
+  "South Africa": "za", "Bosnia and Herzegovina": "ba", "DR Congo": "cd",
+  "Cabo Verde": "cv", Haiti: "ht", Jordan: "jo", "Curaçao": "cw",
+  "New Zealand": "nz",
 };
 
-export function flagFor(team: string): string {
-  return FLAGS[team] ?? "🏳️";
+// Returns the flagcdn code for a team, or "" if unknown.
+export function flagCode(team: string): string {
+  return FLAG_CODES[team] ?? "";
 }
 
 // The 8 players. Edit names here; this is the source of truth for who's in.

@@ -1,7 +1,7 @@
 "use client";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
-import { flagFor } from "@/data/tournament";
+import Flag from "@/components/Flag";
 import Link from "next/link";
 
 export default function SchedulePage() {
@@ -40,15 +40,16 @@ export default function SchedulePage() {
                 </div>
                 <div className="match-teams">
                   <span className={`match-side side-a ${aWon ? "won" : ""}`}>
-                    <span className="team-flag">{flagFor(m.teamA)}</span> {m.teamA}
+                    <Flag team={m.teamA} /> {m.teamA}
                   </span>
                   <span className="match-score">
                     {played ? `${m.scoreA} – ${m.scoreB}` : "vs"}
                   </span>
                   <span className={`match-side side-b ${bWon ? "won" : ""}`}>
-                    {m.teamB} <span className="team-flag">{flagFor(m.teamB)}</span>
+                    {m.teamB} <Flag team={m.teamB} />
                   </span>
                 </div>
+                <div className="match-office-label">Office matchup</div>
                 <div className="match-owners">
                   <span className={aWon ? "won" : "match-owner"}>{oa ?? "—"}</span>
                   <span className="muted"> vs </span>

@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
 import { TeamResult, teamPoints, Match } from "@/lib/scoring";
-import { TIER_MULTIPLIER, flagFor, TEAMS } from "@/data/tournament";
+import { TIER_MULTIPLIER, TEAMS } from "@/data/tournament";
+import Flag from "@/components/Flag";
 
 const PW_KEY = "wcpool_admin_pw"; // remembered for this browser session only
 
@@ -228,7 +229,7 @@ export default function AdminPage() {
         {shown.map((r) => (
           <div className="admin-team" key={r.team}>
             <span className="name">
-              <span className="team-flag">{flagFor(r.team)}</span> {r.team}{" "}
+              <Flag team={r.team} /> {r.team}{" "}
               <span className="flag">({teamPoints(r).toFixed(1)})</span>
             </span>
             <span>
@@ -310,7 +311,7 @@ export default function AdminPage() {
                 {[m.round, m.date].filter(Boolean).join(" · ") || "—"}
               </span>
               <span style={{ flex: 1, textAlign: "right" }}>
-                <span className="team-flag">{flagFor(m.teamA)}</span> {m.teamA}
+                <Flag team={m.teamA} /> {m.teamA}
               </span>
               <input
                 type="number" min={0} placeholder="-"
@@ -326,7 +327,7 @@ export default function AdminPage() {
                 style={{ width: 44, textAlign: "center" }}
               />
               <span style={{ flex: 1 }}>
-                {m.teamB} <span className="team-flag">{flagFor(m.teamB)}</span>
+                {m.teamB} <Flag team={m.teamB} />
               </span>
               <button className="ghost" onClick={() => removeMatch(m.id)} title="Remove">✕</button>
             </div>
