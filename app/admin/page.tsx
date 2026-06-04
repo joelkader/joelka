@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
 import { TeamResult, teamPoints } from "@/lib/scoring";
-import { TIER_MULTIPLIER } from "@/data/tournament";
+import { TIER_MULTIPLIER, flagFor } from "@/data/tournament";
 
 const PW_KEY = "wcpool_admin_pw"; // remembered for this browser session only
 
@@ -190,7 +190,7 @@ export default function AdminPage() {
         {shown.map((r) => (
           <div className="admin-team" key={r.team}>
             <span className="name">
-              {r.team}{" "}
+              <span className="team-flag">{flagFor(r.team)}</span> {r.team}{" "}
               <span className="flag">({teamPoints(r).toFixed(1)})</span>
             </span>
             <span>

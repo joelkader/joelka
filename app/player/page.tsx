@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
 import { buildLeaderboard, teamPoints, groupBasePoints, knockoutBasePoints } from "@/lib/scoring";
-import { TIER_MULTIPLIER } from "@/data/tournament";
+import { TIER_MULTIPLIER, flagFor } from "@/data/tournament";
 import Link from "next/link";
 
 function PlayerView() {
@@ -56,7 +56,7 @@ function PlayerView() {
           <tbody>
             {sorted.map((r) => (
               <tr key={r.team}>
-                <td>{r.team}</td>
+                <td><span className="team-flag">{flagFor(r.team)}</span> {r.team}</td>
                 <td>
                   <span className={`tier-badge tier-${r.tier}`}>
                     ×{TIER_MULTIPLIER[r.tier]}

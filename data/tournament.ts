@@ -82,6 +82,27 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "New Zealand", tier: "Longshot" },
 ];
 
+// Emoji flag per team (display only). Falls back to a neutral flag if missing.
+export const FLAGS: Record<string, string> = {
+  Spain: "🇪🇸", France: "🇫🇷", England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Brazil: "🇧🇷",
+  Argentina: "🇦🇷", Portugal: "🇵🇹", Germany: "🇩🇪", Netherlands: "🇳🇱",
+  Belgium: "🇧🇪", Croatia: "🇭🇷", Uruguay: "🇺🇾", Morocco: "🇲🇦",
+  Switzerland: "🇨🇭", Colombia: "🇨🇴", "United States": "🇺🇸", Mexico: "🇲🇽",
+  Japan: "🇯🇵", Senegal: "🇸🇳", Ecuador: "🇪🇨", "South Korea": "🇰🇷",
+  Norway: "🇳🇴", Sweden: "🇸🇪", Austria: "🇦🇹", "Türkiye": "🇹🇷",
+  Iran: "🇮🇷", Egypt: "🇪🇬", Australia: "🇦🇺", Paraguay: "🇵🇾",
+  "Côte d'Ivoire": "🇨🇮", Algeria: "🇩🇿", Ghana: "🇬🇭", Czechia: "🇨🇿",
+  Tunisia: "🇹🇳", Scotland: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", Qatar: "🇶🇦", "Saudi Arabia": "🇸🇦",
+  Iraq: "🇮🇶", Uzbekistan: "🇺🇿", Panama: "🇵🇦", Canada: "🇨🇦",
+  "South Africa": "🇿🇦", "Bosnia and Herzegovina": "🇧🇦", "DR Congo": "🇨🇩",
+  "Cabo Verde": "🇨🇻", Haiti: "🇭🇹", Jordan: "🇯🇴", "Curaçao": "🇨🇼",
+  "New Zealand": "🇳🇿",
+};
+
+export function flagFor(team: string): string {
+  return FLAGS[team] ?? "🏳️";
+}
+
 // The 8 players. Edit names here; this is the source of truth for who's in.
 export const PLAYERS = [
   "Yaniv B.",
