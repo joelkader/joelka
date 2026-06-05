@@ -902,10 +902,11 @@ function arenaLoop() {
 }
 
 function resizeArena() {
-  /* maintain the engraving's ~4:3 landscape aspect */
+  /* match the engraving's native aspect (3740×2745 → 0.734) so the whole
+     scene fills the frame edge-to-edge with no letterbox gaps */
   const frame = arenaCanvas.parentElement;
   const w     = frame.offsetWidth;
-  const h     = Math.round(w * 0.72);
+  const h     = Math.round(w * 0.734);
   arenaCanvas.width  = w;
   arenaCanvas.height = h;
   arenaCanvas.style.height = h + 'px';
