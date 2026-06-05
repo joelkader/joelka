@@ -759,9 +759,9 @@ window.addEventListener('resize', resize);
 
 const img    = document.createElement('img');
 img.id       = '_portrait';
-img.src      = 'augusts.png';
-img.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
 img.crossOrigin   = 'anonymous';
+img.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
+img.src      = 'augusts.png';
 document.body.appendChild(img);
 
 img.onload = () => samplePortrait(img);
@@ -933,9 +933,9 @@ resizeArena();
 
 const arenaImg    = document.createElement('img');
 arenaImg.id       = '_arena';
-arenaImg.src      = 'arena.jpeg';
-arenaImg.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
 arenaImg.crossOrigin   = 'anonymous';
+arenaImg.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
+arenaImg.src      = 'arena.jpeg';
 document.body.appendChild(arenaImg);
 
 arenaImg.onload = () => { arenaPixels = null; sampleArena(arenaImg); };
