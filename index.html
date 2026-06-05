@@ -829,10 +829,11 @@ function sampleArena(src) {
       const px = Math.min(Math.floor(col * ABLK + ABLK / 2), cw - 1);
       const py = Math.min(Math.floor(row * ABLK + ABLK / 2), ch - 1);
       const i  = (py * cw + px) * 4;
-      /* the engraving is already high-contrast B&W on parchment;
-         invert so ink (dark) becomes bright signal */
-      let raw = 1 - (data[i] + data[i+1] + data[i+2]) / (255 * 3);
-      raw = Math.max(0, Math.min(1, (raw - 0.15) * 1.8));
+      /* positive rendering — same as the portrait: paper/skin reads as
+         bright white blocks, shadow masses drop toward blue. Contrast
+         boost separates the engraving from the tan mat border. */
+      let raw = (data[i] + data[i+1] + data[i+2]) / (255 * 3);
+      raw = Math.max(0, Math.min(1, (raw - 0.45) * 2.4));
       arenaPixels[row * arenaGridCols + col] = raw;
     }
   }
@@ -931,7 +932,7 @@ resizeArena();
 
 const arenaImg    = document.createElement('img');
 arenaImg.id       = '_arena';
-arenaImg.src      = 'arena.png';
+arenaImg.src      = 'arena.jpeg';
 arenaImg.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
 arenaImg.crossOrigin   = 'anonymous';
 document.body.appendChild(arenaImg);
