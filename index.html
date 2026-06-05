@@ -16,7 +16,6 @@
   --amber: #d97706;
   --gold:  #fcd34d;
   --dim:   #7a7068;
-  --line:  rgba(245, 158, 11, 0.10);
   --serif: 'Averia Serif Libre', Georgia, serif;
   --mono:  'JetBrains Mono', monospace;
 }
@@ -39,25 +38,22 @@ body {
 ::selection { background: var(--amber); color: var(--dark); }
 
 /* ─────────────────────────────────────
-   LANDING — full viewport dot portrait
+   LANDING — square pixel engraving hero
 ───────────────────────────────────────*/
 .landing {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
   background: var(--blue);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 84px 24px 40px;
 }
 
-#dot-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* Top bar — nav left, name centered */
+/* Top bar — nav left, socials right */
 .landing-bar {
   position: absolute;
   top: 0;
@@ -68,19 +64,6 @@ body {
   align-items: center;
   padding: 18px 28px;
   pointer-events: none;
-}
-
-.landing-name {
-  display: none;
-}
-
-.landing-text-name {
-  font-family: var(--serif);
-  font-size: 15px;
-  font-weight: 300;
-  color: rgba(255,255,255,0.90);
-  letter-spacing: 0.08em;
-  white-space: nowrap;
 }
 
 .landing-nav {
@@ -117,67 +100,66 @@ body {
 
 .landing-socials a:hover { color: #ffffff; }
 
-/* Text overlay — centered vertically, fixed size so it never reflows */
+/* Perfect square frame — even border on all four sides */
+.hero-frame {
+  position: relative;
+  width: min(82vw, 70vh);
+  aspect-ratio: 1 / 1;
+  border: 2px solid rgba(255,255,255,0.85);
+  padding: 10px;                      /* inner mat between border and image */
+  background: var(--blue);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.18),
+              0 24px 60px rgba(0,0,0,0.35);
+}
+
+#hero-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Centered caption + text content under the square */
 .landing-text {
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
-  pointer-events: none;
-  white-space: nowrap;
+  gap: 14px;
+  text-align: center;
+  max-width: 560px;
 }
 
-.landing-text p,
+.landing-text-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.landing-text p {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.5;
+  margin: 0;
+}
+
 .landing-text strong {
   font-family: var(--serif);
   font-size: 15px;
   font-weight: 700;
   color: #ffffff;
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 2px;
-  margin: 0;
-  white-space: nowrap;
 }
 
-.landing-text p {
-  background: rgba(20, 0, 238, 0.28);
-}
-
-.landing-text strong {
-  background: rgba(20, 0, 238, 0.55);
-}
-
-/* Scroll hint */
-.scroll-hint {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.40;
-  animation: nudge 2.5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.scroll-hint span {
+.landing-caption {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: white;
-}
-
-@keyframes nudge {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  55%       { transform: translateX(-50%) translateY(7px); }
+  color: rgba(255,255,255,0.32);
+  margin-top: 4px;
 }
 
 /* ─────────────────────────────────────
@@ -209,138 +191,6 @@ body {
 }
 
 .about-body p:last-child { margin-bottom: 0; }
-
-/* ─────────────────────────────────────
-   ARTIFACT — centered pixel engraving
-───────────────────────────────────────*/
-.artifact {
-  background: var(--blue);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.artifact-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
-  margin-bottom: 32px;
-  align-self: center;
-}
-
-.artifact-frame {
-  position: relative;
-  width: 100%;
-  max-width: 780px;
-}
-
-/* pixel-corner bracket decorations */
-.artifact-frame::before,
-.artifact-frame::after {
-  content: '';
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-color: rgba(255,255,255,0.30);
-  border-style: solid;
-  z-index: 3;
-}
-.artifact-frame::before {
-  top: -6px; left: -6px;
-  border-width: 2px 0 0 2px;
-}
-.artifact-frame::after {
-  bottom: -6px; right: -6px;
-  border-width: 0 2px 2px 0;
-}
-
-.artifact-frame-inner {
-  position: relative;
-}
-.artifact-frame-inner::before,
-.artifact-frame-inner::after {
-  content: '';
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-color: rgba(255,255,255,0.30);
-  border-style: solid;
-  z-index: 3;
-}
-.artifact-frame-inner::before {
-  top: -6px; right: -6px;
-  border-width: 2px 2px 0 0;
-}
-.artifact-frame-inner::after {
-  bottom: -6px; left: -6px;
-  border-width: 0 0 2px 2px;
-}
-
-#arena-canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  position: relative;
-  z-index: 1;
-}
-
-.artifact-caption {
-  margin-top: 22px;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.28);
-  text-align: center;
-  text-transform: uppercase;
-}
-
-/* ─────────────────────────────────────
-   FOOTER
-───────────────────────────────────────*/
-footer {
-  background: #ffffff;
-  border-top: 1px solid rgba(20, 0, 238, 0.12);
-}
-
-footer .wrap {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.f-copy {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: rgba(20, 0, 238, 0.35);
-}
-
-.f-links {
-  list-style: none;
-  display: flex;
-  gap: 18px;
-  align-items: center;
-}
-
-.f-links a {
-  color: rgba(20, 0, 238, 0.40);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
-}
-
-.f-links a:hover { color: var(--blue); }
 
 /* ─────────────────────────────────────
    WRITING
@@ -393,9 +243,7 @@ footer .wrap {
   margin-bottom: 48px;
 }
 
-.article-list {
-  list-style: none;
-}
+.article-list { list-style: none; }
 
 .article-item {
   border-top: 1px solid rgba(255,255,255,0.12);
@@ -411,7 +259,6 @@ footer .wrap {
   align-items: baseline;
   gap: 20px;
   text-decoration: none;
-  group: true;
 }
 
 .article-year {
@@ -431,9 +278,7 @@ footer .wrap {
   transition: color 0.2s;
 }
 
-.article-item:hover .article-title {
-  color: #ffffff;
-}
+.article-item:hover .article-title { color: #ffffff; }
 
 .article-arrow {
   font-size: 14px;
@@ -463,17 +308,13 @@ footer .wrap {
 <body>
 
 <!-- ══════════════════════════════
-     LANDING — pixel portrait
-     augusts.png in the same folder
+     LANDING — square pixel engraving
+     arena.jpeg in the same folder
 ══════════════════════════════════ -->
 <section class="landing">
-  <canvas id="dot-canvas"></canvas>
-
   <div class="landing-bar">
-    <span class="landing-name">Joel Kader</span>
     <nav class="landing-nav">
       <a href="#about">about</a>
-      <a href="#artifact">arena</a>
       <a href="#writing">writing</a>
     </nav>
     <div class="landing-socials">
@@ -489,12 +330,16 @@ footer .wrap {
     </div>
   </div>
 
+  <div class="hero-frame">
+    <canvas id="hero-canvas"></canvas>
+  </div>
+
   <div class="landing-text">
     <span class="landing-text-name">Joel Kader</span>
     <p>Thoughts on energy, infrastructure, and a world in transition.</p>
     <strong>Guided by curiosity, optimism, and respect for reality.</strong>
+    <span class="landing-caption">Gladiatorial combat · LIB. II · CAPP. XX</span>
   </div>
-
 </section>
 
 <!-- ══════════════════════════════
@@ -522,20 +367,6 @@ footer .wrap {
       </p>
     </div>
   </div>
-</section>
-
-<!-- ══════════════════════════════
-     ARTIFACT — gladiator engraving
-     arena.png in the same folder
-══════════════════════════════════ -->
-<section class="artifact" id="artifact">
-  <div class="artifact-label fade">Arena · LIB. II · CAPP. XX</div>
-  <div class="artifact-frame fade">
-    <div class="artifact-frame-inner">
-      <canvas id="arena-canvas"></canvas>
-    </div>
-  </div>
-  <div class="artifact-caption fade">Gladiatorial combat — copper engraving, 16th c.</div>
 </section>
 
 <!-- ══════════════════════════════
@@ -603,130 +434,131 @@ footer .wrap {
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   PIXEL PORTRAIT — augusts.png
-   - Square block rendering (3 tones: bright / mid / dim)
-   - Horizontal glitch bars animate randomly
-   - Scroll-driven subtle wave drift
+   LANDING HERO — square pixel engraving (arena.jpeg)
+   - centre-cropped to a perfect square, then block-rendered
+   - 3 tones (white / mid / dim) on the blue field
+   - horizontal glitch bars + subtle wave drift
+   - runs immediately, no scroll dependency
    ════════════════════════════════════════════════════════════ */
 
-const canvas = document.getElementById('dot-canvas');
-const ctx    = canvas.getContext('2d');
-
+const BG    = '#1400ee';
 const BLOCK = 5;
 const GAP   = 1;
-const BG    = '#1400ee';
 
-let pixels    = null;
-let gridCols  = 0;
-let gridRows  = 0;
-let imgStartX = 0;
-let imgEndX   = 0;
-let scrollY  = 0;
-let time     = 0;
-let glitchBars = [];
+const heroCanvas = document.getElementById('hero-canvas');
+const heroCtx    = heroCanvas.getContext('2d');
 
-function spawnGlitch() {
-  glitchBars.push({
-    row:    Math.floor(Math.random() * gridRows),
+let heroPixels = null;
+let heroCols   = 0;
+let heroRows   = 0;
+let heroTime   = 0;
+let heroGlitch = [];
+let heroImg    = null;
+
+function spawnHeroGlitch() {
+  heroGlitch.push({
+    row:    Math.floor(Math.random() * heroRows),
     height: 1 + Math.floor(Math.random() * 3),
-    shift:  (Math.random() - 0.5) * 18,
+    shift:  (Math.random() - 0.5) * 16,
     dur:    0.10 + Math.random() * 0.20,
     age:    0
   });
 }
 
-function samplePortrait(img) {
-  const cw = canvas.width;
-  const ch = canvas.height;
+/* centre-crop the source to a square, sample into a brightness grid */
+function sampleHero() {
+  if (!heroImg || !heroImg.naturalWidth) return;
 
+  const S = heroCanvas.width;             // square, device px
   const off    = document.createElement('canvas');
-  off.width    = cw;
-  off.height   = ch;
+  off.width = S; off.height = S;
   const offCtx = off.getContext('2d');
 
-  const scale = cw / img.naturalWidth;
-  const dw    = cw;
-  const dh    = img.naturalHeight * scale;
-  const dx    = 0;
-  const dy    = -ch * 0.10;
-  imgStartX   = 0;
-  imgEndX     = cw;
-  offCtx.drawImage(img, dx, dy, dw, dh);
+  offCtx.fillStyle = BG;
+  offCtx.fillRect(0, 0, S, S);
 
-  const data = offCtx.getImageData(0, 0, cw, ch).data;
+  /* cover-crop: take the largest centred square of the source */
+  const side = Math.min(heroImg.naturalWidth, heroImg.naturalHeight);
+  const sx   = (heroImg.naturalWidth  - side) / 2;
+  const sy   = (heroImg.naturalHeight - side) / 2;
+  offCtx.drawImage(heroImg, sx, sy, side, side, 0, 0, S, S);
 
-  gridCols = Math.ceil(cw / BLOCK);
-  gridRows = Math.ceil(ch / BLOCK);
-  pixels   = new Float32Array(gridCols * gridRows);
+  let data;
+  try {
+    data = offCtx.getImageData(0, 0, S, S).data;
+  } catch (e) {
+    return;   // tainted canvas — bail, keep placeholder
+  }
 
-  for (let row = 0; row < gridRows; row++) {
-    for (let col = 0; col < gridCols; col++) {
-      const px = Math.min(Math.floor(col * BLOCK + BLOCK / 2), cw - 1);
-      const py = Math.min(Math.floor(row * BLOCK + BLOCK / 2), ch - 1);
-      const i  = (py * cw + px) * 4;
+  heroCols = Math.ceil(S / BLOCK);
+  heroRows = Math.ceil(S / BLOCK);
+  heroPixels = new Float32Array(heroCols * heroRows);
+
+  for (let row = 0; row < heroRows; row++) {
+    for (let col = 0; col < heroCols; col++) {
+      const px = Math.min(Math.floor(col * BLOCK + BLOCK / 2), S - 1);
+      const py = Math.min(Math.floor(row * BLOCK + BLOCK / 2), S - 1);
+      const i  = (py * S + px) * 4;
+      /* positive rendering: paper/skin → bright, shadow masses → blue */
       let raw = (data[i] + data[i+1] + data[i+2]) / (255 * 3);
-      raw = Math.max(0, Math.min(1, (raw - 0.38) * 2.2));
-      pixels[row * gridCols + col] = raw;
+      raw = Math.max(0, Math.min(1, (raw - 0.38) * 2.3));
+      heroPixels[row * heroCols + col] = raw;
     }
   }
 }
 
-function draw() {
-  const cw = canvas.width;
-  const ch = canvas.height;
+function drawHero() {
+  const S = heroCanvas.width;
+  heroCtx.fillStyle = BG;
+  heroCtx.fillRect(0, 0, S, S);
 
-  ctx.fillStyle = BG;
-  ctx.fillRect(0, 0, cw, ch);
-
-  const scroll = scrollY * 0.004;
-
-  if (!pixels) {
-    for (let row = 0; row < Math.ceil(ch / BLOCK); row++) {
-      for (let col = 0; col < Math.ceil(cw / BLOCK); col++) {
+  if (!heroPixels) {
+    /* placeholder vignette while the image loads */
+    const n = Math.ceil(S / BLOCK);
+    for (let row = 0; row < n; row++)
+      for (let col = 0; col < n; col++) {
         const bx = col * BLOCK, by = row * BLOCK;
-        const nx = bx / cw - 0.5, ny = by / ch - 0.40;
-        const brt = Math.max(0, 1 - Math.sqrt(nx*nx + ny*ny) * 2.6);
+        const nx = bx / S - 0.5, ny = by / S - 0.5;
+        const brt = Math.max(0, 1 - Math.sqrt(nx*nx + ny*ny) * 2.2);
         if (brt < 0.06) continue;
-        const wx = Math.sin(by / 50 + time * 0.4 + scroll) * 2.5;
-        ctx.fillStyle = `rgba(255,255,255,${(0.15 + brt * 0.4).toFixed(2)})`;
-        ctx.fillRect(bx + wx, by, BLOCK - GAP, BLOCK - GAP);
+        const wx = Math.sin(by / 40 + heroTime * 0.4) * 2.2;
+        heroCtx.fillStyle = `rgba(255,255,255,${(0.12 + brt*0.4).toFixed(2)})`;
+        heroCtx.fillRect(bx + wx, by, BLOCK - GAP, BLOCK - GAP);
       }
-    }
     return;
   }
 
-  const rowShift = new Float32Array(gridRows);
-  for (const b of glitchBars) {
+  const rowShift = new Float32Array(heroRows);
+  for (const b of heroGlitch) {
     const fade = 1 - b.age / b.dur;
-    for (let r = b.row; r < Math.min(b.row + b.height, gridRows); r++) {
+    for (let r = b.row; r < Math.min(b.row + b.height, heroRows); r++)
       rowShift[r] += b.shift * fade;
-    }
   }
 
-  for (let row = 0; row < gridRows; row++) {
-    const by  = row * BLOCK;
-    const gx  = rowShift[row];
-    const wy  = Math.cos(by / 55 + time * 0.18) * (scrollY * 0.002);
+  for (let row = 0; row < heroRows; row++) {
+    const by = row * BLOCK;
+    const gx = rowShift[row];
+    const wy = Math.sin(by / 60 + heroTime * 0.16) * 0.7;
 
-    for (let col = 0; col < gridCols; col++) {
-      const brt = pixels[row * gridCols + col];
-      if (brt < 0.05) continue;
+    for (let col = 0; col < heroCols; col++) {
+      const brt = heroPixels[row * heroCols + col];
+      if (brt < 0.06) continue;
 
       const bx = col * BLOCK;
-      const wx = Math.sin(by / 54 + time * 0.32 + scroll) * 2 + gx;
+      const wx = Math.sin(by / 52 + heroTime * 0.30) * 1.4 + gx;
 
       if (brt > 0.62) {
-        ctx.fillStyle  = '#ffffff';
-        ctx.globalAlpha = Math.min(1, 0.80 + brt * 0.20);
+        heroCtx.fillStyle   = '#ffffff';
+        heroCtx.globalAlpha = Math.min(1, 0.80 + brt * 0.20);
       } else if (brt > 0.35) {
-        ctx.fillStyle  = '#99aaff';
-        ctx.globalAlpha = 0.45 + brt * 0.35;
+        heroCtx.fillStyle   = '#99aaff';
+        heroCtx.globalAlpha = 0.45 + brt * 0.35;
       } else {
-        ctx.fillStyle  = '#4455cc';
-        ctx.globalAlpha = 0.25 + brt * 0.30;
+        heroCtx.fillStyle   = '#4455cc';
+        heroCtx.globalAlpha = 0.25 + brt * 0.30;
       }
 
-      ctx.fillRect(
+      heroCtx.fillRect(
         Math.round(bx + wx),
         Math.round(by + wy),
         BLOCK - GAP,
@@ -734,211 +566,37 @@ function draw() {
       );
     }
   }
-
-  ctx.globalAlpha = 1;
+  heroCtx.globalAlpha = 1;
 }
 
-function loop() {
-  time += 0.014;
-  if (Math.random() < 0.018) spawnGlitch();
-  glitchBars = glitchBars.filter(b => { b.age += 0.016; return b.age < b.dur; });
-  draw();
-  requestAnimationFrame(loop);
+function heroLoop() {
+  heroTime += 0.014;
+  if (Math.random() < 0.016) spawnHeroGlitch();
+  heroGlitch = heroGlitch.filter(b => { b.age += 0.016; return b.age < b.dur; });
+  drawHero();
+  requestAnimationFrame(heroLoop);
 }
 
-function resize() {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-  pixels = null;
-  const img = document.getElementById('_portrait');
-  if (img && img.complete && img.naturalWidth) samplePortrait(img);
+function resizeHero() {
+  /* canvas backing store = its rendered CSS square size */
+  const rect = heroCanvas.getBoundingClientRect();
+  const S = Math.max(1, Math.round(rect.width));
+  heroCanvas.width  = S;
+  heroCanvas.height = S;
+  heroPixels = null;
+  sampleHero();
 }
 
-window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
-window.addEventListener('resize', resize);
+window.addEventListener('resize', resizeHero);
 
-const img    = document.createElement('img');
-img.id       = '_portrait';
-img.crossOrigin   = 'anonymous';
-img.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
-img.src      = 'augusts.png';
-document.body.appendChild(img);
+heroImg = new Image();
+heroImg.crossOrigin = 'anonymous';
+heroImg.onload  = () => { resizeHero(); };
+heroImg.onerror = () => { /* keep placeholder vignette */ };
+heroImg.src = 'arena.jpeg';
 
-img.onload = () => samplePortrait(img);
-
-resize();
-loop();
-
-/* ════════════════════════════════════════════════════════════
-   ARENA SECTION — pixel-dot engraving
-   arena.png in the same folder
-   Same 3-tone block rendering + glitch as landing portrait,
-   but contained in a fixed-aspect canvas frame.
-   ════════════════════════════════════════════════════════════ */
-
-const arenaCanvas  = document.getElementById('arena-canvas');
-const arenaCtx     = arenaCanvas.getContext('2d');
-const ABLK = 4;   // slightly finer block for the engraving detail
-const AGAP = 1;
-
-let arenaPixels   = null;
-let arenaGridCols = 0;
-let arenaGridRows = 0;
-let arenaTime     = 0;
-let arenaActive   = false;
-let arenaGlitch   = [];
-
-function spawnArenaGlitch() {
-  arenaGlitch.push({
-    row:    Math.floor(Math.random() * arenaGridRows),
-    height: 1 + Math.floor(Math.random() * 2),
-    shift:  (Math.random() - 0.5) * 12,
-    dur:    0.12 + Math.random() * 0.22,
-    age:    0
-  });
-}
-
-function sampleArena(src) {
-  const cw = arenaCanvas.width;
-  const ch = arenaCanvas.height;
-
-  const off    = document.createElement('canvas');
-  off.width    = cw;
-  off.height   = ch;
-  const offCtx = off.getContext('2d');
-
-  /* fit image to canvas, centred, preserving aspect ratio */
-  const imgAR   = src.naturalWidth / src.naturalHeight;
-  const canvAR  = cw / ch;
-  let dw, dh, dx, dy;
-  if (imgAR > canvAR) {
-    dw = cw; dh = cw / imgAR; dx = 0; dy = (ch - dh) / 2;
-  } else {
-    dh = ch; dw = ch * imgAR; dy = 0; dx = (cw - dw) / 2;
-  }
-  offCtx.drawImage(src, dx, dy, dw, dh);
-
-  const data = offCtx.getImageData(0, 0, cw, ch).data;
-
-  arenaGridCols = Math.ceil(cw / ABLK);
-  arenaGridRows = Math.ceil(ch / ABLK);
-  arenaPixels   = new Float32Array(arenaGridCols * arenaGridRows);
-
-  for (let row = 0; row < arenaGridRows; row++) {
-    for (let col = 0; col < arenaGridCols; col++) {
-      const px = Math.min(Math.floor(col * ABLK + ABLK / 2), cw - 1);
-      const py = Math.min(Math.floor(row * ABLK + ABLK / 2), ch - 1);
-      const i  = (py * cw + px) * 4;
-      /* positive rendering — same as the portrait: paper/skin reads as
-         bright white blocks, shadow masses drop toward blue. Contrast
-         boost separates the engraving from the tan mat border. */
-      let raw = (data[i] + data[i+1] + data[i+2]) / (255 * 3);
-      raw = Math.max(0, Math.min(1, (raw - 0.45) * 2.4));
-      arenaPixels[row * arenaGridCols + col] = raw;
-    }
-  }
-}
-
-function drawArena() {
-  const cw = arenaCanvas.width;
-  const ch = arenaCanvas.height;
-
-  arenaCtx.fillStyle = BG;
-  arenaCtx.fillRect(0, 0, cw, ch);
-
-  if (!arenaPixels) return;
-
-  const rowShift = new Float32Array(arenaGridRows);
-  for (const b of arenaGlitch) {
-    const fade = 1 - b.age / b.dur;
-    for (let r = b.row; r < Math.min(b.row + b.height, arenaGridRows); r++) {
-      rowShift[r] += b.shift * fade;
-    }
-  }
-
-  for (let row = 0; row < arenaGridRows; row++) {
-    const by = row * ABLK;
-    const gx = rowShift[row];
-    /* very subtle vertical wave — no scroll dependency since this is mid-page */
-    const wy = Math.sin(by / 60 + arenaTime * 0.14) * 0.6;
-
-    for (let col = 0; col < arenaGridCols; col++) {
-      const brt = arenaPixels[row * arenaGridCols + col];
-      if (brt < 0.06) continue;
-
-      const bx = col * ABLK;
-      const wx = Math.sin(by / 52 + arenaTime * 0.28) * 1.2 + gx;
-
-      if (brt > 0.65) {
-        arenaCtx.fillStyle  = '#ffffff';
-        arenaCtx.globalAlpha = Math.min(1, 0.78 + brt * 0.22);
-      } else if (brt > 0.38) {
-        arenaCtx.fillStyle  = '#99aaff';
-        arenaCtx.globalAlpha = 0.42 + brt * 0.32;
-      } else {
-        arenaCtx.fillStyle  = '#4455cc';
-        arenaCtx.globalAlpha = 0.22 + brt * 0.28;
-      }
-
-      arenaCtx.fillRect(
-        Math.round(bx + wx),
-        Math.round(by + wy),
-        ABLK - AGAP,
-        ABLK - AGAP
-      );
-    }
-  }
-
-  arenaCtx.globalAlpha = 1;
-}
-
-function arenaLoop() {
-  if (!arenaActive) return;
-  arenaTime += 0.012;
-  if (Math.random() < 0.012) spawnArenaGlitch();
-  arenaGlitch = arenaGlitch.filter(b => { b.age += 0.016; return b.age < b.dur; });
-  drawArena();
-  requestAnimationFrame(arenaLoop);
-}
-
-function resizeArena() {
-  /* match the engraving's native aspect (3740×2745 → 0.734) so the whole
-     scene fills the frame edge-to-edge with no letterbox gaps */
-  const frame = arenaCanvas.parentElement;
-  const w     = frame.offsetWidth;
-  const h     = Math.round(w * 0.734);
-  arenaCanvas.width  = w;
-  arenaCanvas.height = h;
-  arenaCanvas.style.height = h + 'px';
-
-  arenaPixels = null;
-  const src = document.getElementById('_arena');
-  if (src && src.complete && src.naturalWidth) sampleArena(src);
-}
-
-new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting && !arenaActive) {
-      arenaActive = true;
-      resizeArena();
-      arenaLoop();
-    } else if (!e.isIntersecting) {
-      arenaActive = false;
-    }
-  });
-}, { threshold: 0.05 }).observe(document.getElementById('artifact'));
-
-window.addEventListener('resize', resizeArena);
-resizeArena();
-
-const arenaImg    = document.createElement('img');
-arenaImg.id       = '_arena';
-arenaImg.crossOrigin   = 'anonymous';
-arenaImg.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;';
-arenaImg.src      = 'arena.jpeg';
-document.body.appendChild(arenaImg);
-
-arenaImg.onload = () => { arenaPixels = null; sampleArena(arenaImg); };
+resizeHero();
+heroLoop();
 
 /* ════════════════════════════════════════════════════════════
    WRITING SECTION — ambient pixel background
@@ -949,12 +607,10 @@ let bgTime = 0;
 let bgActive = false;
 
 function drawBg() {
-  const cw = bgCanvas.width;
-  const ch = bgCanvas.height;
+  const cw = bgCanvas.width, ch = bgCanvas.height;
   bgCtx.fillStyle = BG;
   bgCtx.fillRect(0, 0, cw, ch);
-
-  for (let row = 0; row < Math.ceil(ch / BLOCK); row++) {
+  for (let row = 0; row < Math.ceil(ch / BLOCK); row++)
     for (let col = 0; col < Math.ceil(cw / BLOCK); col++) {
       const bx = col * BLOCK, by = row * BLOCK;
       const v = Math.sin(bx / 55 + bgTime * 0.28) * Math.cos(by / 40 + bgTime * 0.18);
@@ -962,9 +618,8 @@ function drawBg() {
       if (brt < 0.08) continue;
       bgCtx.fillStyle = '#ffffff';
       bgCtx.globalAlpha = brt * 0.55;
-      bgCtx.fillRect(bx, by, BLOCK - AGAP, BLOCK - AGAP);
+      bgCtx.fillRect(bx, by, BLOCK - GAP, BLOCK - GAP);
     }
-  }
   bgCtx.globalAlpha = 1;
 }
 
@@ -983,13 +638,8 @@ function resizeBg() {
 
 new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if (e.isIntersecting && !bgActive) {
-      bgActive = true;
-      resizeBg();
-      bgLoop();
-    } else if (!e.isIntersecting) {
-      bgActive = false;
-    }
+    if (e.isIntersecting && !bgActive) { bgActive = true; resizeBg(); bgLoop(); }
+    else if (!e.isIntersecting) { bgActive = false; }
   });
 }, { threshold: 0.05 }).observe(document.getElementById('writing'));
 
