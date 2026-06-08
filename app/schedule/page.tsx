@@ -2,6 +2,7 @@
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
 import Flag from "@/components/Flag";
+import TierTag from "@/components/TierTag";
 import Link from "next/link";
 
 export default function SchedulePage() {
@@ -60,13 +61,13 @@ export default function SchedulePage() {
                     </div>
                     <div className="match-teams">
                       <span className={`match-side side-a ${aWon ? "won" : ""}`}>
-                        <Flag team={m.teamA} /> {m.teamA}
+                        <Flag team={m.teamA} /> {m.teamA} <TierTag team={m.teamA} />
                       </span>
                       <span className="match-score">
                         {played ? `${m.scoreA} – ${m.scoreB}` : "vs"}
                       </span>
                       <span className={`match-side side-b ${bWon ? "won" : ""}`}>
-                        {m.teamB} <Flag team={m.teamB} />
+                        <TierTag team={m.teamB} /> {m.teamB} <Flag team={m.teamB} />
                       </span>
                     </div>
                     <div className="match-office-label">Office matchup</div>

@@ -84,6 +84,16 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "Australia", tier: "Longshot" },
 ];
 
+// Tier lookup by team name (for showing multipliers next to teams).
+export const TIER_BY_TEAM: Record<string, Tier> = Object.fromEntries(
+  TEAMS.map((t) => [t.name, t.tier])
+);
+
+// A team's tier, or null for unknown teams (e.g. knockout placeholders).
+export function tierFor(team: string): Tier | null {
+  return TIER_BY_TEAM[team] ?? null;
+}
+
 // ISO 3166-1 alpha-2 codes (and FIFA subdivisions) per team, used to render
 // real flag images via flagcdn.com. Emoji flags don't render on many browsers
 // (e.g. Windows), so we use images instead.

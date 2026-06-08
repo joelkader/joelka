@@ -3,6 +3,7 @@ import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
 import { groupStandings } from "@/lib/scoring";
 import Flag from "@/components/Flag";
+import TierTag from "@/components/TierTag";
 import Link from "next/link";
 
 export default function StandingsPage() {
@@ -44,7 +45,7 @@ export default function StandingsPage() {
                   {rows.map((r, i) => (
                     <tr key={r.team}>
                       <td className={i < 2 ? "qual" : ""}>{i + 1}</td>
-                      <td><Flag team={r.team} /> {r.team}</td>
+                      <td><Flag team={r.team} /> {r.team} <TierTag team={r.team} /></td>
                       <td className="num">{r.played}</td>
                       <td className="num">{r.w}</td>
                       <td className="num">{r.d}</td>
