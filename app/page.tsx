@@ -20,7 +20,13 @@ export default function Home() {
       <h1>Leaderboard</h1>
       <p className="sub">Last updated {updated} · pot ${POT}</p>
       <p className="payout">
-        🥇 ${PAYOUTS.first} &nbsp; 🥈 ${PAYOUTS.second} &nbsp; 🥉 ${PAYOUTS.third}
+        {PAYOUTS.second === 0 && PAYOUTS.third === 0 ? (
+          <>🏆 Winner takes all · ${PAYOUTS.first}</>
+        ) : (
+          <>
+            🥇 ${PAYOUTS.first} &nbsp; 🥈 ${PAYOUTS.second} &nbsp; 🥉 ${PAYOUTS.third}
+          </>
+        )}
       </p>
 
       <div className="card">

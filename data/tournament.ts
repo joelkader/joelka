@@ -118,6 +118,6 @@ export const PLAYERS = [
   "Aviv B.",
 ];
 
-// 8 players × $30 buy-in.
-export const POT = 240;
-export const PAYOUTS = { first: 150, second: 60, third: 30 };
+// 8 players × $25 buy-in, winner takes all.
+export const POT = 200;
+export const PAYOUTS = { first: 200, second: 0, third: 0 };
