@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
-import { TeamResult, teamPoints, Match } from "@/lib/scoring";
+import { TeamResult, teamPoints, Match, groupRecordsByTeam, hydrateGroupResults } from "@/lib/scoring";
 import { TIER_MULTIPLIER, TEAMS } from "@/data/tournament";
 import Flag from "@/components/Flag";
 
@@ -117,7 +117,12 @@ export default function AdminPage() {
       const res = await fetch("/api/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, results: rows, players, matches }),
+        body: JSON.stringify({
+          password,
+          results: hydrateGroupResults(rows, matches), // group W/D from scores
+          players,
+          matches,
+        }),
       });
       if (res.status === 401) {
         flash("Wrong password");
@@ -174,6 +179,9 @@ export default function AdminPage() {
     r.team.toLowerCase().includes(filter.toLowerCase())
   );
 
+  // Group W/D are derived from the entered match scores (single source).
+  const recs = groupRecordsByTeam(matches);
+
   // Unsaved-changes flag — drives the floating "Save" button in the corner.
   const dirty =
     JSON.stringify(rows) !== JSON.stringify(state.results) ||
@@ -226,11 +234,16 @@ export default function AdminPage() {
           <span>Fin</span>
           <span>🏆</span>
         </div>
-        {shown.map((r) => (
+        {shown.map((r) => {
+          const rec = recs.get(r.team);
+          const gw = rec?.w ?? 0;
+          const gd = rec?.d ?? 0;
+          const pts = teamPoints({ ...r, groupWins: gw, groupDraws: gd });
+          return (
           <div className="admin-team" key={r.team}>
             <span className="name">
               <Flag team={r.team} /> {r.team}{" "}
-              <span className="flag">({teamPoints(r).toFixed(1)})</span>
+              <span className="flag">({pts.toFixed(1)})</span>
             </span>
             <span>
               <span className={`tier-badge tier-${r.tier}`}>×{TIER_MULTIPLIER[r.tier]}</span>
@@ -244,12 +257,8 @@ export default function AdminPage() {
                 <option key={p} value={p}>{p}</option>
               ))}
             </select>
-            <input type="number" min={0} max={3} value={r.groupWins}
-              onChange={(e) => update(r.team, { groupWins: clamp(+e.target.value, 0, 3) })}
-              style={{ width: 48 }} />
-            <input type="number" min={0} max={3} value={r.groupDraws}
-              onChange={(e) => update(r.team, { groupDraws: clamp(+e.target.value, 0, 3) })}
-              style={{ width: 48 }} />
+            <span className="derived" title="From match scores">{gw}</span>
+            <span className="derived" title="From match scores">{gd}</span>
             <input type="checkbox" checked={r.reachedR32}
               onChange={(e) => update(r.team, { reachedR32: e.target.checked })} />
             <input type="checkbox" checked={r.reachedR16}
@@ -263,8 +272,13 @@ export default function AdminPage() {
             <input type="checkbox" checked={r.champion}
               onChange={(e) => update(r.team, { champion: e.target.checked })} />
           </div>
-        ))}
+          );
+        })}
       </div>
+      <p className="muted" style={{ marginTop: 6 }}>
+        GW/GD are calculated from the group match scores below. Tick the knockout
+        rounds a team reaches.
+      </p>
 
       <h2>Schedule</h2>
       <p className="muted" style={{ marginTop: -6, marginBottom: 10 }}>
@@ -366,10 +380,6 @@ export default function AdminPage() {
       {toast && <div className="toast">{toast}</div>}
     </Shell>
   );
-}
-
-function clamp(n: number, lo: number, hi: number) {
-  return Math.max(lo, Math.min(hi, isNaN(n) ? 0 : n));
 }
 
 function Shell({ children }: { children: React.ReactNode }) {

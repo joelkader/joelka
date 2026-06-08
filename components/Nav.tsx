@@ -7,6 +7,7 @@ export default function Nav() {
       <span className="brand">⚽ WC 2026 POOL</span>
       <Link href="/">Leaderboard</Link>
       <Link href="/schedule">Schedule</Link>
+      <Link href="/standings">Standings</Link>
       <Link href="/player">My Teams</Link>
       <Link href="/admin">Admin</Link>
       <span className="nav-spacer" />

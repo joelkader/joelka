@@ -98,3 +98,85 @@ export function buildLeaderboard(
   });
   return standings.sort((a, b) => b.total - a.total);
 }
+
+// ----------------------------------------------------------------------------
+// GROUP STANDINGS — derived from played group-stage match scores
+// ----------------------------------------------------------------------------
+// A win = 3 pts, a draw = 1 pt each, a loss = 0. These records also feed the
+// pool's group points (see hydrateGroupResults), so entering match scores is
+// the single source of truth for the group stage — draws included.
+
+export interface GroupRow {
+  team: string;
+  played: number;
+  w: number;
+  d: number;
+  l: number;
+  gf: number;
+  ga: number;
+  gd: number;
+  pts: number;
+}
+
+function blankRow(team: string): GroupRow {
+  return { team, played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
+}
+
+// Per-team W/D/L records from all *played* group-stage matches.
+export function groupRecordsByTeam(matches: Match[]): Map<string, GroupRow> {
+  const recs = new Map<string, GroupRow>();
+  const get = (t: string) => {
+    if (!recs.has(t)) recs.set(t, blankRow(t));
+    return recs.get(t)!;
+  };
+  for (const m of matches) {
+    if (!m.round.startsWith("Group ")) continue;
+    if (m.scoreA == null || m.scoreB == null) continue;
+    const a = get(m.teamA);
+    const b = get(m.teamB);
+    a.played++; b.played++;
+    a.gf += m.scoreA; a.ga += m.scoreB;
+    b.gf += m.scoreB; b.ga += m.scoreA;
+    if (m.scoreA > m.scoreB) { a.w++; a.pts += 3; b.l++; }
+    else if (m.scoreA < m.scoreB) { b.w++; b.pts += 3; a.l++; }
+    else { a.d++; b.d++; a.pts++; b.pts++; }
+  }
+  for (const r of recs.values()) r.gd = r.gf - r.ga;
+  return recs;
+}
+
+// Full standings per group (every team in the group, even with 0 played),
+// sorted by points, then goal difference, goals for, name.
+export function groupStandings(matches: Match[]): { group: string; rows: GroupRow[] }[] {
+  const teamsByGroup = new Map<string, Set<string>>();
+  for (const m of matches) {
+    if (!m.round.startsWith("Group ")) continue;
+    if (!teamsByGroup.has(m.round)) teamsByGroup.set(m.round, new Set());
+    teamsByGroup.get(m.round)!.add(m.teamA);
+    teamsByGroup.get(m.round)!.add(m.teamB);
+  }
+  const recs = groupRecordsByTeam(matches);
+  return [...teamsByGroup.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([group, teams]) => {
+      const rows = [...teams].map((t) => recs.get(t) ?? blankRow(t));
+      rows.sort(
+        (a, b) =>
+          b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team)
+      );
+      return { group, rows };
+    });
+}
+
+// Returns results with group wins/draws derived from match scores, so the
+// pool's group points come straight from entered results (draws counted).
+export function hydrateGroupResults(
+  results: TeamResult[],
+  matches: Match[]
+): TeamResult[] {
+  const recs = groupRecordsByTeam(matches);
+  return results.map((r) => {
+    const rec = recs.get(r.team);
+    return { ...r, groupWins: rec?.w ?? 0, groupDraws: rec?.d ?? 0 };
+  });
+}

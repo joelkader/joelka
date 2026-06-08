@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
-import { buildLeaderboard, teamPoints, groupBasePoints, knockoutBasePoints } from "@/lib/scoring";
+import { buildLeaderboard, teamPoints, hydrateGroupResults } from "@/lib/scoring";
 import { TIER_MULTIPLIER } from "@/data/tournament";
 import Flag from "@/components/Flag";
 import Link from "next/link";
@@ -30,9 +30,10 @@ function PlayerView() {
     );
   }
 
-  const board = buildLeaderboard(state.results, state.players);
+  const results = hydrateGroupResults(state.results, state.matches ?? []);
+  const board = buildLeaderboard(results, state.players);
   const rank = board.findIndex((b) => b.player === name) + 1;
-  const mine = state.results.filter((r) => r.owner === name);
+  const mine = results.filter((r) => r.owner === name);
   const total = mine.reduce((s, r) => s + teamPoints(r), 0);
 
   const sorted = [...mine].sort((a, b) => teamPoints(b) - teamPoints(a));

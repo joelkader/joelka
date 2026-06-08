@@ -1,7 +1,7 @@
 "use client";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
-import { buildLeaderboard } from "@/lib/scoring";
+import { buildLeaderboard, hydrateGroupResults } from "@/lib/scoring";
 import { PAYOUTS, POT } from "@/data/tournament";
 import Link from "next/link";
 
@@ -11,7 +11,8 @@ export default function Home() {
   if (error) return <Shell><p className="muted">Couldn’t load data: {error}</p></Shell>;
   if (!state) return <Shell><p className="muted">Loading…</p></Shell>;
 
-  const board = buildLeaderboard(state.results, state.players);
+  const results = hydrateGroupResults(state.results, state.matches ?? []);
+  const board = buildLeaderboard(results, state.players);
   const max = Math.max(1, ...board.map((b) => b.total));
   const updated = new Date(state.lastUpdated).toLocaleString();
 

@@ -50,11 +50,13 @@ export default function SchedulePage() {
                 const played = m.scoreA != null && m.scoreB != null;
                 const aWon = played && (m.scoreA as number) > (m.scoreB as number);
                 const bWon = played && (m.scoreB as number) > (m.scoreA as number);
+                const drawn = played && (m.scoreA as number) === (m.scoreB as number);
                 return (
                   <div key={m.id} className="match-row">
                     <div className="match-meta">
                       {m.date && <span className="muted">{m.date}</span>}
                       {m.venue && <span className="match-venue">{m.venue}</span>}
+                      {drawn && <span className="draw-tag">Draw</span>}
                     </div>
                     <div className="match-teams">
                       <span className={`match-side side-a ${aWon ? "won" : ""}`}>
@@ -70,7 +72,7 @@ export default function SchedulePage() {
                     <div className="match-office-label">Office matchup</div>
                     <div className="match-owners">
                       <span className={aWon ? "won" : "match-owner"}>{oa ?? "—"}</span>
-                      <span className="muted"> vs </span>
+                      <span className="muted"> {drawn ? "drew" : "vs"} </span>
                       <span className={bWon ? "won" : "match-owner"}>{ob ?? "—"}</span>
                     </div>
                   </div>
