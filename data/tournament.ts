@@ -27,8 +27,10 @@ export const BASE_POINTS = {
 } as const;
 
 // All 48 teams with their tier assignment.
+// Distribution: 8 Favorites · 8 Contenders · 16 Mid · 16 Longshot
+// (so the 1-1-2-2 draft over 8 players uses every team with none left over).
 export const TEAMS: { name: string; tier: Tier }[] = [
-  // Favorites
+  // Favorites (8)
   { name: "Spain", tier: "Favorite" },
   { name: "France", tier: "Favorite" },
   { name: "England", tier: "Favorite" },
@@ -37,18 +39,18 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "Portugal", tier: "Favorite" },
   { name: "Germany", tier: "Favorite" },
   { name: "Netherlands", tier: "Favorite" },
-  // Contenders
+  // Contenders (8)
   { name: "Belgium", tier: "Contender" },
   { name: "Croatia", tier: "Contender" },
   { name: "Uruguay", tier: "Contender" },
   { name: "Morocco", tier: "Contender" },
   { name: "Switzerland", tier: "Contender" },
   { name: "Colombia", tier: "Contender" },
-  // Mid
+  { name: "Japan", tier: "Contender" },
+  { name: "Senegal", tier: "Contender" },
+  // Mid (16)
   { name: "United States", tier: "Mid" },
   { name: "Mexico", tier: "Mid" },
-  { name: "Japan", tier: "Mid" },
-  { name: "Senegal", tier: "Mid" },
   { name: "Ecuador", tier: "Mid" },
   { name: "South Korea", tier: "Mid" },
   { name: "Norway", tier: "Mid" },
@@ -57,13 +59,13 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "Türkiye", tier: "Mid" },
   { name: "Iran", tier: "Mid" },
   { name: "Egypt", tier: "Mid" },
-  { name: "Australia", tier: "Mid" },
   { name: "Paraguay", tier: "Mid" },
   { name: "Côte d'Ivoire", tier: "Mid" },
   { name: "Algeria", tier: "Mid" },
   { name: "Ghana", tier: "Mid" },
-  // Longshots
-  { name: "Czechia", tier: "Longshot" },
+  { name: "Czechia", tier: "Mid" },
+  { name: "Canada", tier: "Mid" },
+  // Longshots (16)
   { name: "Tunisia", tier: "Longshot" },
   { name: "Scotland", tier: "Longshot" },
   { name: "Qatar", tier: "Longshot" },
@@ -71,7 +73,6 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "Iraq", tier: "Longshot" },
   { name: "Uzbekistan", tier: "Longshot" },
   { name: "Panama", tier: "Longshot" },
-  { name: "Canada", tier: "Longshot" },
   { name: "South Africa", tier: "Longshot" },
   { name: "Bosnia and Herzegovina", tier: "Longshot" },
   { name: "DR Congo", tier: "Longshot" },
@@ -80,6 +81,7 @@ export const TEAMS: { name: string; tier: Tier }[] = [
   { name: "Jordan", tier: "Longshot" },
   { name: "Curaçao", tier: "Longshot" },
   { name: "New Zealand", tier: "Longshot" },
+  { name: "Australia", tier: "Longshot" },
 ];
 
 // ISO 3166-1 alpha-2 codes (and FIFA subdivisions) per team, used to render
