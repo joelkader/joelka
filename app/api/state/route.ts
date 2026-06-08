@@ -6,14 +6,9 @@ export const dynamic = "force-dynamic"; // run at request time (reads Blobs)
 
 export async function GET() {
   const state = await loadState();
-  // Cache at the CDN/edge so repeat loads and polls don't wake the function
-  // every time. The data only changes on an admin save, and the app tolerates
-  // ~60s lag. The browser still revalidates (max-age=0); the edge serves a
-  // cached copy for up to 30s and a stale one while it refreshes.
+  // No caching: an admin save must be visible immediately. (A CDN cache here
+  // made saves look like they "reverted" — the edge served a pre-save copy.)
   return NextResponse.json(state, {
-    headers: {
-      "Cache-Control":
-        "public, max-age=0, s-maxage=30, stale-while-revalidate=120",
-    },
+    headers: { "Cache-Control": "no-store, max-age=0" },
   });
 }

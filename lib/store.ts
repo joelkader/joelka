@@ -103,7 +103,9 @@ function heal(state: PoolState): PoolState {
 async function getBlobStore() {
   try {
     const { getStore } = await import("@netlify/blobs");
-    return getStore(BLOB_STORE);
+    // Strong consistency so a read right after a write returns the new value
+    // (avoids saves appearing to "revert").
+    return getStore({ name: BLOB_STORE, consistency: "strong" });
   } catch {
     return null;
   }
