@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Nav() {
   return (
@@ -8,6 +9,8 @@ export default function Nav() {
       <Link href="/schedule">Schedule</Link>
       <Link href="/player">My Teams</Link>
       <Link href="/admin">Admin</Link>
+      <span className="nav-spacer" />
+      <ThemeToggle />
     </nav>
   );
 }

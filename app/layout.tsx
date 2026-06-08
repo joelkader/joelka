@@ -11,8 +11,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Apply the saved theme before first paint to avoid a flash. Defaults to dark.
+  const themeScript = `(function(){try{var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );
