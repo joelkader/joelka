@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { usePoolState } from "@/lib/usePoolState";
-import { TeamResult, teamPoints, Match, groupRecordsByTeam, hydrateGroupResults } from "@/lib/scoring";
-import { TIER_MULTIPLIER, TEAMS } from "@/data/tournament";
+import { TeamResult, teamPoints, Match, hydrateResults, stageShort } from "@/lib/scoring";
+import { TIER_MULTIPLIER, TEAMS, tierFor } from "@/data/tournament";
 import Flag from "@/components/Flag";
+
+const isRealTeam = (t: string) => !!tierFor(t);
 
 const PW_KEY = "wcpool_admin_pw"; // remembered for this browser session only
 
@@ -119,7 +121,7 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           password,
-          results: hydrateGroupResults(rows, matches), // group W/D from scores
+          results: hydrateResults(rows, matches), // group + knockout from matches
           players,
           matches,
         }),
@@ -175,12 +177,14 @@ export default function AdminPage() {
   // ---- Unlocked: full admin controls. ----
   if (!state) return <Shell><p className="muted">Loading…</p></Shell>;
 
-  const shown = rows.filter((r) =>
+  // Group W/D and knockout progress are derived from the entered matches.
+  const view = hydrateResults(rows, matches);
+  const shown = view.filter((r) =>
     r.team.toLowerCase().includes(filter.toLowerCase())
   );
 
-  // Group W/D are derived from the entered match scores (single source).
-  const recs = groupRecordsByTeam(matches);
+  const groupMatches = matches.filter((m) => m.round.startsWith("Group "));
+  const koMatches = matches.filter((m) => !m.round.startsWith("Group "));
 
   // Unsaved-changes flag — drives the floating "Save" button in the corner.
   const dirty =
@@ -227,23 +231,13 @@ export default function AdminPage() {
           <span>Owner</span>
           <span>GW</span>
           <span>GD</span>
-          <span>R32</span>
-          <span>R16</span>
-          <span>QF</span>
-          <span>SF</span>
-          <span>Fin</span>
-          <span>🏆</span>
+          <span>Stage</span>
         </div>
-        {shown.map((r) => {
-          const rec = recs.get(r.team);
-          const gw = rec?.w ?? 0;
-          const gd = rec?.d ?? 0;
-          const pts = teamPoints({ ...r, groupWins: gw, groupDraws: gd });
-          return (
+        {shown.map((r) => (
           <div className="admin-team" key={r.team}>
             <span className="name">
               <Flag team={r.team} /> {r.team}{" "}
-              <span className="flag">({pts.toFixed(1)})</span>
+              <span className="flag">({teamPoints(r).toFixed(1)})</span>
             </span>
             <span>
               <span className={`tier-badge tier-${r.tier}`}>×{TIER_MULTIPLIER[r.tier]}</span>
@@ -257,33 +251,21 @@ export default function AdminPage() {
                 <option key={p} value={p}>{p}</option>
               ))}
             </select>
-            <span className="derived" title="From match scores">{gw}</span>
-            <span className="derived" title="From match scores">{gd}</span>
-            <input type="checkbox" checked={r.reachedR32}
-              onChange={(e) => update(r.team, { reachedR32: e.target.checked })} />
-            <input type="checkbox" checked={r.reachedR16}
-              onChange={(e) => update(r.team, { reachedR16: e.target.checked })} />
-            <input type="checkbox" checked={r.reachedQF}
-              onChange={(e) => update(r.team, { reachedQF: e.target.checked })} />
-            <input type="checkbox" checked={r.reachedSF}
-              onChange={(e) => update(r.team, { reachedSF: e.target.checked })} />
-            <input type="checkbox" checked={r.reachedFinal}
-              onChange={(e) => update(r.team, { reachedFinal: e.target.checked })} />
-            <input type="checkbox" checked={r.champion}
-              onChange={(e) => update(r.team, { champion: e.target.checked })} />
+            <span className="derived" title="From group scores">{r.groupWins}</span>
+            <span className="derived" title="From group scores">{r.groupDraws}</span>
+            <span className="derived" title="From the bracket">{stageShort(r)}</span>
           </div>
-          );
-        })}
+        ))}
       </div>
       <p className="muted" style={{ marginTop: 6 }}>
-        GW/GD are calculated from the group match scores below. Tick the knockout
-        rounds a team reaches.
+        Owner is the only thing you set here. GW/GD come from group scores and
+        the Stage comes from the knockout bracket — both entered below.
       </p>
 
       <h2>Schedule</h2>
       <p className="muted" style={{ marginTop: -6, marginBottom: 10 }}>
-        Add fixtures (e.g. France vs Senegal). The public Schedule page shows the
-        owning players facing off; enter scores once a match is played.
+        Group stage: enter the score. Knockouts: pick the two teams and check who
+        advances (the score doesn’t matter). Everything else updates automatically.
       </p>
 
       {/* Add a match */}
@@ -316,37 +298,89 @@ export default function AdminPage() {
         <button onClick={addMatch}>Add match</button>
       </div>
 
-      {/* Existing matches */}
-      {matches.length > 0 && (
-        <div className="card" style={{ padding: 0, marginTop: 10 }}>
-          {matches.map((m) => (
-            <div key={m.id} className="admin-match">
-              <span className="muted" style={{ minWidth: 120 }}>
-                {[m.round, m.date].filter(Boolean).join(" · ") || "—"}
-              </span>
-              <span style={{ flex: 1, textAlign: "right" }}>
-                <Flag team={m.teamA} /> {m.teamA}
-              </span>
-              <input
-                type="number" min={0} placeholder="-"
-                value={m.scoreA ?? ""}
-                onChange={(e) => updateMatch(m.id, { scoreA: parseScore(e.target.value) })}
-                style={{ width: 44, textAlign: "center" }}
-              />
-              <span className="muted">–</span>
-              <input
-                type="number" min={0} placeholder="-"
-                value={m.scoreB ?? ""}
-                onChange={(e) => updateMatch(m.id, { scoreB: parseScore(e.target.value) })}
-                style={{ width: 44, textAlign: "center" }}
-              />
-              <span style={{ flex: 1 }}>
-                {m.teamB} <Flag team={m.teamB} />
-              </span>
-              <button className="ghost" onClick={() => removeMatch(m.id)} title="Remove">✕</button>
-            </div>
-          ))}
-        </div>
+      {/* Group fixtures — enter scores */}
+      {groupMatches.length > 0 && (
+        <>
+          <h3 className="editor-sub">Group fixtures — enter scores</h3>
+          <div className="card" style={{ padding: 0 }}>
+            {groupMatches.map((m) => (
+              <div key={m.id} className="admin-match">
+                <span className="muted" style={{ minWidth: 130 }}>
+                  {[m.round, m.date].filter(Boolean).join(" · ") || "—"}
+                </span>
+                <span style={{ flex: 1, textAlign: "right" }}>
+                  <Flag team={m.teamA} /> {m.teamA}
+                </span>
+                <input
+                  type="number" min={0} placeholder="-"
+                  value={m.scoreA ?? ""}
+                  onChange={(e) => updateMatch(m.id, { scoreA: parseScore(e.target.value) })}
+                  style={{ width: 44, textAlign: "center" }}
+                />
+                <span className="muted">–</span>
+                <input
+                  type="number" min={0} placeholder="-"
+                  value={m.scoreB ?? ""}
+                  onChange={(e) => updateMatch(m.id, { scoreB: parseScore(e.target.value) })}
+                  style={{ width: 44, textAlign: "center" }}
+                />
+                <span style={{ flex: 1 }}>
+                  {m.teamB} <Flag team={m.teamB} />
+                </span>
+                {!m.id.startsWith("wc-") && (
+                  <button className="ghost" onClick={() => removeMatch(m.id)} title="Remove">✕</button>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Knockouts — pick teams and check who advances */}
+      {koMatches.length > 0 && (
+        <>
+          <h3 className="editor-sub">Knockouts — pick teams &amp; check who advances</h3>
+          <div className="card" style={{ padding: 0 }}>
+            {koMatches.map((m) => (
+              <div key={m.id} className="admin-ko">
+                <span className="muted ko-meta">
+                  {[m.round, m.date].filter(Boolean).join(" · ")}
+                </span>
+                <select
+                  className="ko-team"
+                  value={isRealTeam(m.teamA) ? m.teamA : ""}
+                  onChange={(e) => updateMatch(m.id, { teamA: e.target.value })}
+                >
+                  <option value="">{isRealTeam(m.teamA) ? "— team —" : m.teamA}</option>
+                  {TEAMS.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
+                </select>
+                <label className="adv" title="advances">
+                  <input
+                    type="checkbox"
+                    checked={m.winner === "A"}
+                    onChange={(e) => updateMatch(m.id, { winner: e.target.checked ? "A" : null })}
+                  />{" "}adv
+                </label>
+                <span className="muted">vs</span>
+                <label className="adv" title="advances">
+                  <input
+                    type="checkbox"
+                    checked={m.winner === "B"}
+                    onChange={(e) => updateMatch(m.id, { winner: e.target.checked ? "B" : null })}
+                  />{" "}adv
+                </label>
+                <select
+                  className="ko-team"
+                  value={isRealTeam(m.teamB) ? m.teamB : ""}
+                  onChange={(e) => updateMatch(m.id, { teamB: e.target.value })}
+                >
+                  <option value="">{isRealTeam(m.teamB) ? "— team —" : m.teamB}</option>
+                  {TEAMS.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
+                </select>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
@@ -366,7 +400,8 @@ export default function AdminPage() {
         </button>
       </div>
       <p className="muted" style={{ marginTop: 8 }}>
-        Tip: tick achievements cumulatively. A team in the QF should have R32, R16 and QF all checked.
+        Tip: in the knockouts you only set the two teams and check who advances —
+        points and the bracket fill in automatically.
       </p>
 
       {/* Floating save button — appears in the corner once you've made a change. */}

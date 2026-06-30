@@ -5,7 +5,7 @@
 // This is the heart of the pool. Keep it pure so it's trivial to test.
 // ============================================================================
 
-import { BASE_POINTS, TIER_MULTIPLIER, Tier } from "@/data/tournament";
+import { BASE_POINTS, TIER_MULTIPLIER, Tier, tierFor } from "@/data/tournament";
 
 // The mutable result state for a single team, updated by the admin as the
 // tournament progresses. Achievement flags are cumulative: a team in the QF
@@ -36,6 +36,7 @@ export interface Match {
   teamB: string;
   scoreA: number | null;
   scoreB: number | null;
+  winner?: "A" | "B" | null; // knockout: which side advanced (score irrelevant)
 }
 
 export function emptyResult(team: string, tier: Tier): TeamResult {
@@ -179,4 +180,97 @@ export function hydrateGroupResults(
     const rec = recs.get(r.team);
     return { ...r, groupWins: rec?.w ?? 0, groupDraws: rec?.d ?? 0 };
   });
+}
+
+// ----------------------------------------------------------------------------
+// KNOCKOUT ACHIEVEMENTS — derived from the bracket matches
+// ----------------------------------------------------------------------------
+// A team that appears in a knockout match reached that round; the Final's
+// winner is champion. Cumulative (reaching a round implies all earlier ones).
+// The "Third place" match adds nothing (both teams already reached the SF).
+
+export interface KnockoutRec {
+  reachedR32: boolean;
+  reachedR16: boolean;
+  reachedQF: boolean;
+  reachedSF: boolean;
+  reachedFinal: boolean;
+  champion: boolean;
+}
+
+const KO_STAGE: Record<string, keyof KnockoutRec> = {
+  "Round of 32": "reachedR32",
+  "Round of 16": "reachedR16",
+  "Quarter-final": "reachedQF",
+  "Semi-final": "reachedSF",
+  "Final": "reachedFinal",
+};
+
+export function knockoutAchievements(matches: Match[]): Map<string, KnockoutRec> {
+  const recs = new Map<string, KnockoutRec>();
+  const get = (t: string) => {
+    if (!recs.has(t))
+      recs.set(t, {
+        reachedR32: false, reachedR16: false, reachedQF: false,
+        reachedSF: false, reachedFinal: false, champion: false,
+      });
+    return recs.get(t)!;
+  };
+  for (const m of matches) {
+    const stage = KO_STAGE[m.round];
+    if (!stage) continue; // group + third-place don't add achievements
+    for (const t of [m.teamA, m.teamB]) if (tierFor(t)) get(t)[stage] = true;
+    if (m.round === "Final" && m.winner) {
+      const w = m.winner === "A" ? m.teamA : m.teamB;
+      if (tierFor(w)) get(w).champion = true;
+    }
+  }
+  // Make cumulative: a later stage implies all earlier ones.
+  for (const r of recs.values()) {
+    if (r.champion) r.reachedFinal = true;
+    if (r.reachedFinal) r.reachedSF = true;
+    if (r.reachedSF) r.reachedQF = true;
+    if (r.reachedQF) r.reachedR16 = true;
+    if (r.reachedR16) r.reachedR32 = true;
+  }
+  return recs;
+}
+
+// Full hydration: group W/D from match scores AND knockout achievements from
+// the bracket — so all of a team's points come from entered match data.
+export function hydrateResults(
+  results: TeamResult[],
+  matches: Match[]
+): TeamResult[] {
+  const g = groupRecordsByTeam(matches);
+  const k = knockoutAchievements(matches);
+  return results.map((r) => {
+    const gr = g.get(r.team);
+    const kr = k.get(r.team);
+    return {
+      ...r,
+      groupWins: gr?.w ?? 0,
+      groupDraws: gr?.d ?? 0,
+      reachedR32: kr?.reachedR32 ?? false,
+      reachedR16: kr?.reachedR16 ?? false,
+      reachedQF: kr?.reachedQF ?? false,
+      reachedSF: kr?.reachedSF ?? false,
+      reachedFinal: kr?.reachedFinal ?? false,
+      champion: kr?.champion ?? false,
+    };
+  });
+}
+
+// Highest knockout stage label for a team (for compact display).
+export function stageShort(r: {
+  champion: boolean; reachedFinal: boolean; reachedSF: boolean;
+  reachedQF: boolean; reachedR16: boolean; reachedR32: boolean;
+}): string {
+  if (r.champion) return "🏆";
+  if (r.reachedFinal) return "Final";
+  if (r.reachedSF) return "SF";
+  if (r.reachedQF) return "QF";
+  if (r.reachedR16) return "R16";
+  if (r.reachedR32) return "R32";
+  return "—";
 }

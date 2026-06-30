@@ -35,7 +35,7 @@ function seedState(): PoolState {
   return {
     results: TEAMS.map((t) => emptyResult(t.name, t.tier)),
     players: PLAYERS,
-    matches: DEFAULT_MATCHES.map((m) => ({ ...m })),
+    matches: DEFAULT_MATCHES.map((m) => ({ ...m, winner: null })),
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -68,23 +68,21 @@ function heal(state: PoolState): PoolState {
   // Older saved state may predate the schedule feature.
   if (!Array.isArray(state.matches)) state.matches = [];
 
-  // Reconcile the built-in fixtures (ids prefixed "grp-") against the official
-  // schedule: update teams/round/date from the data file but keep any
-  // admin-entered scores, add missing ones, and drop stale built-ins. Matches
-  // the admin added by hand (other id prefixes) are left untouched.
+  // Reconcile the built-in fixtures against the schedule file. IMPORTANT: only
+  // refresh metadata (round/date/venue). NEVER overwrite teamA/teamB/scores/
+  // winner — those hold saved match results and admin-set knockout matchups,
+  // and must stay untouched. Add any new fixtures; drop stale built-ins.
   const defaultById = new Map(DEFAULT_MATCHES.map((m) => [m.id, m]));
   const byId = new Map(state.matches.map((m) => [m.id, m]));
   for (const dm of DEFAULT_MATCHES) {
     const ex = byId.get(dm.id);
     if (ex) {
-      // Keep admin-entered scores; refresh the fixture details from the file.
-      ex.teamA = dm.teamA;
-      ex.teamB = dm.teamB;
       ex.round = dm.round;
       ex.date = dm.date;
       ex.venue = dm.venue;
+      if (ex.winner === undefined) ex.winner = null;
     } else {
-      state.matches.push({ ...dm });
+      state.matches.push({ ...dm, winner: null });
     }
   }
   // Drop stale built-in fixtures (ids prefixed "wc-"/"grp-") no longer in the
