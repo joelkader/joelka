@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Physical containers on the property ───
+model Container {
+  id            String   @id @default(cuid())
+  serialNumber  String   @unique
+  sizeFt        Int      @default(40) // 20 or 40
+  purchaseDate  DateTime?
+  purchaseCost  Float?
+  locationOnSite String? // e.g. "Row A, Slot 3"
+  condition     String   @default("good") // good | fair | needs_repair
+  notes         String?
+  createdAt     DateTime @default(now())
+  units         Unit[]
+}
+
+// ─── Individual rentable units (subdivisions of containers) ───
+enum UnitSize {
+  QUARTER // ~10ft x 8ft
+  HALF    // ~20ft x 8ft
+  FULL    // ~40ft x 8ft
+}
+
+enum UnitStatus {
+  AVAILABLE
+  RESERVED  // deposit paid, pending move-in
+  OCCUPIED
+  MAINTENANCE
+}
+
+model Unit {
+  id            String     @id @default(cuid())
+  unitNumber    String     @unique // e.g. "A-01", "B-03"
+  containerId   String
+  container     Container  @relation(fields: [containerId], references: [id])
+  size          UnitSize
+  monthlyRate   Float      // base rate in USD
+  hasElectricity Boolean   @default(false)
+  premiumAmount Float      @default(0) // surcharge for electricity/premium features
+  status        UnitStatus @default(AVAILABLE)
+  notes         String?
+  createdAt     DateTime   @default(now())
+  leases        Lease[]
+  accessLogs    AccessLog[]
+}
+
+// ─── Tenants ───
+model Tenant {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  whatsapp      String?
+  idDocument    String?  // cedula or passport number
+  nationality   String?
+  billingAddress String?
+  stripeCustomerId String? @unique
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  leases        Lease[]
+  accessLogs    AccessLog[]
+}
+
+// ─── Lease agreements ───
+enum LeaseStatus {
+  PENDING    // inquiry submitted, not yet confirmed
+  ACTIVE     // signed, deposit paid, unit occupied
+  NOTICE     // tenant gave 30-day notice
+  ENDED      // lease completed
+  CANCELLED  // cancelled before activation
+}
+
+model Lease {
+  id                  String      @id @default(cuid())
+  tenantId            String
+  tenant              Tenant      @relation(fields: [tenantId], references: [id])
+  unitId              String
+  unit                Unit        @relation(fields: [unitId], references: [id])
+  startDate           DateTime
+  endDate             DateTime?   // null = month-to-month
+  monthlyRate         Float
+  depositAmount       Float
+  depositStatus       String      @default("unpaid") // unpaid | paid | returned | forfeited
+  status              LeaseStatus @default(PENDING)
+  stripeSubscriptionId String?
+  stripeCheckoutSessionId String?
+  noticeDate          DateTime?   // when tenant gave notice
+  moveOutDate         DateTime?
+  notes               String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  payments            Payment[]
+}
+
+// ─── Payment records ───
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentType {
+  DEPOSIT
+  MONTHLY_RENT
+  LATE_FEE
+  REFUND
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  leaseId         String
+  lease           Lease         @relation(fields: [leaseId], references: [id])
+  amount          Float
+  type            PaymentType
+  status          PaymentStatus @default(PENDING)
+  dueDate         DateTime?
+  paidDate        DateTime?
+  stripeInvoiceId String?
+  stripePaymentIntentId String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+}
+
+// ─── Access logs for security tracking ───
+model AccessLog {
+  id           String   @id @default(cuid())
+  tenantId     String?
+  tenant       Tenant?  @relation(fields: [tenantId], references: [id])
+  unitId       String
+  unit         Unit     @relation(fields: [unitId], references: [id])
+  accessMethod String   @default("code") // code | key | smart_lock
+  timestamp    DateTime @default(now())
+  notes        String?
+}
+
+// ─── Waitlist for when units are full ───
+model WaitlistEntry {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  preferredSize UnitSize?
+  notes         String?
+  createdAt     DateTime @default(now())
+  contacted     Boolean  @default(false)
+}
