@@ -3,33 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --signal: #d9622b;
-  --steel: #4b5563;
-  --steel-dark: #2c333b;
-  --sand: #e8ddc8;
-  --sand-light: #f5efe1;
-  --marine: #3c5a56;
-  --marine-faded: #6f8b87;
+  /* Brand: a single vivid orange, white, and a near-black ink. */
+  --signal: #e8531e; /* Santa Bodega orange */
+  --signal-deep: #cf461544;
+  --ink: #1e2530;
+  --paper: #ffffff;
+  --paper-warm: #fbf6f1;
 }
 
 body {
-  background: var(--sand-light);
-  color: var(--steel-dark);
+  background: var(--paper-warm);
+  color: var(--ink);
 }
 
 .font-display {
   font-family: var(--font-display), sans-serif;
-  font-stretch: condensed;
-  letter-spacing: 0.02em;
 }
 
-/* Corrugated container siding, built from stripes rather than an image. */
+/* Faint corrugated siding, built from stripes rather than an image. */
 .corrugation {
   background-image: repeating-linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.06) 0px,
-    rgba(255, 255, 255, 0.06) 4px,
+    rgba(255, 255, 255, 0.08) 0px,
+    rgba(255, 255, 255, 0.08) 4px,
     transparent 4px,
-    transparent 14px
+    transparent 15px
   );
 }

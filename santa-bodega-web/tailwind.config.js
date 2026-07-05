@@ -4,13 +4,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        signal: "#d9622b",
-        steel: "#4b5563",
-        "steel-dark": "#2c333b",
-        sand: "#e8ddc8",
-        "sand-light": "#f5efe1",
-        marine: "#3c5a56",
-        "marine-faded": "#6f8b87",
+        signal: "#e8531e",
+        ink: "#1e2530",
+        "ink-soft": "#5b6472",
+        paper: "#ffffff",
+        "paper-warm": "#fbf6f1",
       },
       fontFamily: {
         display: ["var(--font-display)"],

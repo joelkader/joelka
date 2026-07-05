@@ -50,8 +50,8 @@ function PaymentResult() {
     <main className="max-w-md mx-auto px-6 py-24 text-center">
       {status === "ACTIVE" && (
         <>
-          <h1 className="font-display text-3xl text-marine uppercase mb-4">¡Listo!</h1>
-          <p className="text-steel">
+          <h1 className="font-display text-3xl text-signal uppercase mb-4">¡Listo!</h1>
+          <p className="text-ink-soft">
             Tu bodega está confirmada. Te enviamos el código de acceso por WhatsApp.
           </p>
         </>
@@ -61,7 +61,7 @@ function PaymentResult() {
           <h1 className="font-display text-3xl text-red-600 uppercase mb-4">
             Pago no completado
           </h1>
-          <p className="text-steel">
+          <p className="text-ink-soft">
             Algo falló con el pago. Puedes intentar de nuevo o escribirnos por WhatsApp.
           </p>
         </>
@@ -69,7 +69,7 @@ function PaymentResult() {
       {status !== "ACTIVE" && status !== "FAILED" && (
         <>
           <h1 className="font-display text-3xl text-signal uppercase mb-4">Confirmando...</h1>
-          <p className="text-steel">
+          <p className="text-ink-soft">
             Estamos confirmando tu pago. Esto puede tardar unos segundos, no cierres esta
             página.
           </p>

@@ -35,14 +35,14 @@ function BookForm() {
 
   return (
     <main className="max-w-md mx-auto px-6 py-16">
-      <h1 className="font-display text-3xl uppercase text-steel-dark mb-2">Reservar bodega</h1>
-      <p className="text-steel mb-8">Unidad #{unitId || "—"}</p>
+      <h1 className="font-display text-3xl uppercase text-ink mb-2">Reservar bodega</h1>
+      <p className="text-ink-soft mb-8">Unidad #{unitId || "—"}</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           required
           placeholder="Nombre completo"
-          className="w-full border border-steel/30 rounded px-4 py-3"
+          className="w-full border border-ink/20 rounded px-4 py-3"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
@@ -50,7 +50,7 @@ function BookForm() {
           required
           type="email"
           placeholder="Correo electrónico"
-          className="w-full border border-steel/30 rounded px-4 py-3"
+          className="w-full border border-ink/20 rounded px-4 py-3"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
@@ -58,7 +58,7 @@ function BookForm() {
           required
           type="tel"
           placeholder="WhatsApp (+506...)"
-          className="w-full border border-steel/30 rounded px-4 py-3"
+          className="w-full border border-ink/20 rounded px-4 py-3"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
         />

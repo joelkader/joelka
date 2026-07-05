@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
+import { Fredoka, Inter } from "next/font/google";
 import "./globals.css";
 
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-display" });
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+});
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
@@ -14,7 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className={`${archivo.variable} ${inter.variable} font-body`}>{children}</body>
+      <body className={`${fredoka.variable} ${inter.variable} font-body`}>{children}</body>
     </html>
   );
 }
