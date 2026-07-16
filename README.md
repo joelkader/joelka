@@ -1,5 +1,10 @@
 # World Cup 2026 Office Pool — Tracker
 
+> **Also in this repo:** ⚡ **Watt Street — Energy & Compute Analyst Academy**, a self-contained training
+> game + 12-week curriculum for energy/power/data-center/compute finance roles. Open
+> `public/academy/index.html` in a browser (or visit `/academy/index.html` on the deployed site).
+> Docs: [`public/academy/README.md`](public/academy/README.md).
+
 A small Next.js app for a 6-person office World Cup pool. The draw happens in
 person (papers from a hat); this app tracks who owns which teams, applies the
 underdog-weighted scoring, and shows a live leaderboard everyone can follow.
