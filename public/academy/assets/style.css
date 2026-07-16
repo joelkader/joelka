@@ -17,6 +17,26 @@
   --radius: 12px;
   --mono: "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
 }
+/* Light tokens: applied by OS preference when no explicit choice, and by
+   explicit data-theme="light" (from in-app Settings or an embedding viewer's
+   toggle). data-theme="dark" always wins back the dark tokens. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f4f6fb;
+    --bg2: #ffffff;
+    --card: #ffffff;
+    --card2: #eef1f9;
+    --line: #d8ddec;
+    --ink: #1a2138;
+    --ink-dim: #4d5878;
+    --ink-faint: #8b94b3;
+    --accent: #c76a00;
+    --accent2: #177a4c;
+    --bad: #c22f3d;
+    --info: #1f6fc4;
+    --gold: #a97b00;
+  }
+}
 [data-theme="light"] {
   --bg: #f4f6fb;
   --bg2: #ffffff;

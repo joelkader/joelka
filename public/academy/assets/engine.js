@@ -56,7 +56,7 @@ function defaultSave() {
   return {
     xp: 0, drillBest: {}, bossBest: {}, labState: {}, lessonsRead: {},
     missed: [], srs: {}, streak: { last: "", n: 0 }, superday: { best: 0, taken: 0 },
-    mission: { date: "", done: false }, stats: { answered: 0, correct: 0 }, theme: "dark"
+    mission: { date: "", done: false }, stats: { answered: 0, correct: 0 }, theme: "auto"
   };
 }
 function load() {
@@ -158,7 +158,11 @@ function renderTopbar() {
     (due ? `<span class="pill" style="cursor:pointer" onclick="location.hash='#/cards'">🃏 <b>${due}</b> due</span>` : "");
 }
 function setTheme() {
-  document.documentElement.setAttribute("data-theme", S.theme === "light" ? "light" : "dark");
+  // Explicit choice stamps the root; "auto" leaves the attribute to the OS media
+  // query or an embedding viewer's own theme toggle (never fight an external stamp).
+  if (S.theme === "light" || S.theme === "dark") {
+    document.documentElement.setAttribute("data-theme", S.theme);
+  }
 }
 function el(id) { return document.getElementById(id); }
 function view(html) {
@@ -791,7 +795,8 @@ function vSettings() {
     <div class="card">
       <h3 style="margin-top:0">Theme</h3>
       <div class="btnrow">
-        <button class="btn ${S.theme !== "light" ? "primary" : ""}" onclick="App.setThemeMode('dark')">Dark</button>
+        <button class="btn ${S.theme === "auto" ? "primary" : ""}" onclick="App.setThemeMode('auto')">Auto (system)</button>
+        <button class="btn ${S.theme === "dark" ? "primary" : ""}" onclick="App.setThemeMode('dark')">Dark</button>
         <button class="btn ${S.theme === "light" ? "primary" : ""}" onclick="App.setThemeMode('light')">Light</button></div>
       <h3>Progress</h3>
       <p class="lead" style="font-size:14px">XP ${fmt(S.xp, 0)} · ${S.stats.correct}/${S.stats.answered} lifetime correct
@@ -806,7 +811,12 @@ function vSettings() {
       <div id="exportbox"></div>
     </div>`);
 }
-function setThemeMode(t) { S.theme = t; save(); setTheme(); vSettings(); }
+function setThemeMode(t) {
+  S.theme = t; save();
+  if (t === "auto") document.documentElement.removeAttribute("data-theme");
+  else setTheme();
+  vSettings();
+}
 function exportSave() {
   el("exportbox").innerHTML = `<textarea class="writebox" onclick="this.select()">${esc(JSON.stringify(S))}</textarea>
     <p class="lead" style="font-size:13px">Copy this somewhere safe; paste it into Import on another machine.</p>`;
@@ -892,11 +902,15 @@ ACADEMY.selfTest = function (iters) {
 };
 
 /* ----------------------------------------------------------------- boot -- */
-document.addEventListener("DOMContentLoaded", () => {
+function boot() {
   load();
   setTheme();
   ACADEMY.modules.sort((a, b) => (a.order || 0) - (b.order || 0));
   renderTopbar();
   window.addEventListener("hashchange", route);
   route();
-});
+}
+/* Content files load after engine.js, so defer boot to the end of the parse —
+   but stay resilient to embedders that inject this after DOMContentLoaded. */
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else setTimeout(boot, 0);
