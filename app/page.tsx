@@ -1,5 +1,6 @@
 "use client";
 import Nav from "@/components/Nav";
+import ChampionCelebration from "@/components/ChampionCelebration";
 import { usePoolState } from "@/lib/usePoolState";
 import { buildLeaderboard, hydrateResults } from "@/lib/scoring";
 import { PAYOUTS, POT } from "@/data/tournament";
@@ -18,6 +19,7 @@ export default function Home() {
 
   return (
     <Shell>
+      <ChampionCelebration />
       <h1>Leaderboard</h1>
       <p className="sub">Last updated {updated} · pot ${POT}</p>
       <p className="payout">
