@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joel Kader</title>
+<link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue:  #1400ee;
+  --white: #ffffff;
+  --dark:  #080808;
+  --amber: #d97706;
+  --serif: 'Averia Serif Libre', Georgia, serif;
+  --mono:  'JetBrains Mono', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #333 var(--blue);
+}
+
+body {
+  background: var(--blue);
+  color: var(--white);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+::selection { background: var(--amber); color: var(--dark); }
+
+/* ── shared ────────────────────────────────────────────── */
+.wrap {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.fade {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade.in { opacity: 1; transform: none; }
+
+/* ── landing ───────────────────────────────────────────── */
+.landing {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding: 76px 24px 44px;
+}
+
+.bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  padding: 20px 26px;
+  z-index: 10;
+}
+
+.bar nav { display: flex; gap: 22px; }
+
+.bar nav a {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.bar nav a:hover { color: #fff; }
+
+.socials {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.socials a {
+  color: rgba(255,255,255,0.60);
+  display: flex;
+  transition: color 0.2s;
+}
+
+.socials a:hover { color: #fff; }
+
+/* the figure — centred, ~75% of the viewport's short side.
+   the 100vh-250px term keeps the whole landing on one screen. */
+.figure {
+  width: min(75vmin, 760px, 100vh - 250px);
+  min-width: 240px;
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(255,255,255,0.55);
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+#hero { display: block; width: 100%; height: 100%; }
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  max-width: 520px;
+}
+
+.intro .name {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.50);
+  margin-bottom: 4px;
+}
+
+.intro p {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.94);
+}
+
+.intro p.lede { font-weight: 700; }
+
+/* ── about ─────────────────────────────────────────────── */
+.about {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 108px 0;
+}
+
+.about p {
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--blue);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.about p:last-child { margin-bottom: 0; }
+
+/* ── writing ───────────────────────────────────────────── */
+.writing {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 108px 0 76px;
+}
+
+#grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.45;
+}
+
+.writing .wrap { position: relative; z-index: 1; max-width: 640px; }
+
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 34px;
+}
+
+ul { list-style: none; }
+
+li {
+  border-top: 1px solid rgba(255,255,255,0.14);
+  padding: 18px 0;
+}
+
+li:last-child { border-bottom: 1px solid rgba(255,255,255,0.14); }
+
+li a {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  text-decoration: none;
+}
+
+.year {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 16px;
+  color: rgba(255,255,255,0.86);
+  line-height: 1.4;
+  transition: color 0.2s;
+}
+
+li:hover .title { color: #fff; }
+
+.arrow {
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.2s;
+}
+
+li:hover .arrow { color: rgba(255,255,255,0.7); transform: translateX(3px); }
+
+.foot {
+  position: relative;
+  z-index: 1;
+  margin-top: 38px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.32);
+}
+
+@media (max-width: 600px) {
+  .wrap { padding: 0 24px; }
+  .about { padding: 84px 0; }
+  .about p { font-size: 17px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── landing ─────────────────────────────────────────── -->
+<section class="landing">
+  <div class="bar">
+    <nav>
+      <a href="#about">about</a>
+      <a href="#writing">writing</a>
+    </nav>
+    <div class="socials">
+      <a href="https://x.com/joel_kader" target="_blank" rel="noopener" aria-label="X">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/joel-kader" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="https://joelkader.substack.com" target="_blank" rel="noopener" aria-label="Substack">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="figure">
+    <canvas id="hero"></canvas>
+  </div>
+
+  <div class="intro">
+    <span class="name">Joel Kader</span>
+    <p class="lede">Notes on energy, infrastructure, and the systems quietly remaking the world.</p>
+    <p>Written with curiosity, optimism, and a stubborn respect for reality.</p>
+  </div>
+</section>
+
+<!-- ── about ───────────────────────────────────────────── -->
+<section class="about" id="about">
+  <div class="wrap">
+    <p class="fade">
+      This is a space for thoughts in motion; essays, notes, and fragments on energy, infrastructure,
+      technology, capital, and the deeper systems shaping our world.
+    </p>
+    <p class="fade">
+      Every revolution begins with small fractures. Changing incentives, disruptive tools, and the
+      gradual but constant reordering of the status quo. Slowly, quietly, then all at once.
+    </p>
+    <p class="fade">
+      It feels increasingly clear that we are entering a new era of building, one shaped not only
+      by foundational technologies, but by the implications they carry for existing systems,
+      institutions, and the physical world. Periods like these are rare. They ask for attention,
+      reflection, and a willingness to engage with change.
+    </p>
+    <p class="fade"><strong>This space is my effort to do so.</strong></p>
+  </div>
+</section>
+
+<!-- ── writing ─────────────────────────────────────────── -->
+<section class="writing" id="writing">
+  <canvas id="grid"></canvas>
+  <div class="wrap">
+    <div class="label fade">Writing</div>
+    <ul>
+      <li class="fade">
+        <a href="https://joelkader.substack.com/p/print-till-agi-the-continuation" target="_blank" rel="noopener">
+          <span class="year">2026</span>
+          <span class="title">Print Till AGI, The Continuation</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+      <li class="fade">
+        <a href="https://joelkader.substack.com/p/magic-mirror-on-the-wall-are-we-in" target="_blank" rel="noopener">
+          <span class="year">2025</span>
+          <span class="title">Magic mirror on the wall, are we in an AI Bubble after all?</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+      <li class="fade">
+        <a href="https://joelkader.substack.com/p/the-ai-race-isnt-a-marathon-anymore" target="_blank" rel="noopener">
+          <span class="year">2025</span>
+          <span class="title">The AI race isn't a marathon anymore. It's a hectic 100-meter sprint.</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+      <li class="fade">
+        <a href="https://joelkader.substack.com/p/electrons-vs-ideology-the-real-threat" target="_blank" rel="noopener">
+          <span class="year">2025</span>
+          <span class="title">Electrons vs. Ideology: The Real Threat in the AI Era</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+      <li class="fade">
+        <a href="https://joelkader.substack.com/p/trump-saudi-royalty-elon-sam-altman" target="_blank" rel="noopener">
+          <span class="year">2025</span>
+          <span class="title">Trump, Saudi Royalty, Elon, Sam Altman, and Jensen Huang walk into a bar...</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+      <li class="fade">
+        <a href="https://medium.com/@joelkader9/its-not-drill-baby-drill-it-s-build-baby-build-fb5ca3db1f69" target="_blank" rel="noopener">
+          <span class="year">2025</span>
+          <span class="title">It's not 'drill, baby, drill' it's 'build, baby, build!'</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+      <li class="fade">
+        <a href="https://medium.com/@kaderj/only-as-strong-as-the-weakest-link-climate-change-the-ira-and-the-potential-energy-transition-0bb2318a31ba" target="_blank" rel="noopener">
+          <span class="year">2024</span>
+          <span class="title">'Only as strong as the weakest link': Climate change, the IRA, and the potential energy transition bubble</span>
+          <span class="arrow">→</span>
+        </a>
+      </li>
+    </ul>
+    <div class="foot fade">Views are my own.</div>
+  </div>
+</section>
+
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   PIXEL AUGUSTUS — augusts.png
+   Square centre-crop, 3-tone block render on the blue field,
+   horizontal glitch bars + slow wave drift. Starts immediately.
+   ══════════════════════════════════════════════════════════ */
+
+const BG = '#1400ee', BLOCK = 5, GAP = 1;
+
+const hero    = document.getElementById('hero');
+const heroCtx = hero.getContext('2d');
+
+let px = null, cols = 0, rows = 0, t = 0, glitch = [], src = null;
+
+function sample() {
+  if (!src || !src.naturalWidth) return;
+
+  const S = hero.width;
+  const off = document.createElement('canvas');
+  off.width = off.height = S;
+  const o = off.getContext('2d');
+
+  o.fillStyle = BG;
+  o.fillRect(0, 0, S, S);
+
+  // largest square of the source; on a tall portrait bias upward for the face
+  const iw = src.naturalWidth, ih = src.naturalHeight;
+  const side = Math.min(iw, ih);
+  const sx = (iw - side) / 2;
+  const sy = ih > iw ? (ih - side) * 0.12 : (ih - side) / 2;
+  o.drawImage(src, sx, sy, side, side, 0, 0, S, S);
+
+  let d;
+  try { d = o.getImageData(0, 0, S, S).data; }
+  catch (e) { return; }                       // tainted canvas — keep placeholder
+
+  cols = rows = Math.ceil(S / BLOCK);
+  px = new Float32Array(cols * rows);
+
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const x = Math.min((c * BLOCK + BLOCK / 2) | 0, S - 1);
+      const y = Math.min((r * BLOCK + BLOCK / 2) | 0, S - 1);
+      const i = (y * S + x) * 4;
+      // contrast boost lifts the marble off the gallery wall
+      let v = (d[i] + d[i+1] + d[i+2]) / 765;
+      px[r * cols + c] = Math.max(0, Math.min(1, (v - 0.38) * 2.2));
+    }
+}
+
+function drawHero() {
+  const S = hero.width;
+  heroCtx.fillStyle = BG;
+  heroCtx.fillRect(0, 0, S, S);
+
+  if (!px) {                                   // vignette until the image lands
+    const n = Math.ceil(S / BLOCK);
+    for (let r = 0; r < n; r++)
+      for (let c = 0; c < n; c++) {
+        const bx = c * BLOCK, by = r * BLOCK;
+        const nx = bx / S - 0.5, ny = by / S - 0.5;
+        const b = Math.max(0, 1 - Math.hypot(nx, ny) * 2.2);
+        if (b < 0.06) continue;
+        heroCtx.fillStyle = `rgba(255,255,255,${(0.12 + b * 0.4).toFixed(2)})`;
+        heroCtx.fillRect(bx + Math.sin(by / 40 + t * 0.4) * 2.2, by, BLOCK - GAP, BLOCK - GAP);
+      }
+    return;
+  }
+
+  const shift = new Float32Array(rows);
+  for (const g of glitch) {
+    const fade = 1 - g.age / g.dur;
+    for (let r = g.row; r < Math.min(g.row + g.h, rows); r++) shift[r] += g.dx * fade;
+  }
+
+  for (let r = 0; r < rows; r++) {
+    const by = r * BLOCK;
+    const wy = Math.sin(by / 60 + t * 0.16) * 0.7;
+    const wx = Math.sin(by / 52 + t * 0.30) * 1.4 + shift[r];
+
+    for (let c = 0; c < cols; c++) {
+      const b = px[r * cols + c];
+      if (b < 0.05) continue;
+
+      if (b > 0.62)      { heroCtx.fillStyle = '#ffffff'; heroCtx.globalAlpha = Math.min(1, 0.80 + b * 0.20); }
+      else if (b > 0.35) { heroCtx.fillStyle = '#99aaff'; heroCtx.globalAlpha = 0.45 + b * 0.35; }
+      else               { heroCtx.fillStyle = '#4455cc'; heroCtx.globalAlpha = 0.25 + b * 0.30; }
+
+      heroCtx.fillRect(Math.round(c * BLOCK + wx), Math.round(by + wy), BLOCK - GAP, BLOCK - GAP);
+    }
+  }
+  heroCtx.globalAlpha = 1;
+}
+
+function loop() {
+  t += 0.014;
+  if (Math.random() < 0.016)
+    glitch.push({
+      row: (Math.random() * rows) | 0,
+      h:   1 + ((Math.random() * 3) | 0),
+      dx:  (Math.random() - 0.5) * 16,
+      dur: 0.10 + Math.random() * 0.20,
+      age: 0
+    });
+  glitch = glitch.filter(g => (g.age += 0.016) < g.dur);
+  drawHero();
+  requestAnimationFrame(loop);
+}
+
+function sizeHero() {
+  const S = Math.max(1, Math.round(hero.getBoundingClientRect().width));
+  hero.width = hero.height = S;
+  px = null;
+  sample();
+}
+
+src = new Image();
+src.crossOrigin = 'anonymous';
+src.onload = sizeHero;
+src.src = 'augusts.png';
+
+window.addEventListener('resize', sizeHero);
+sizeHero();
+loop();
+
+/* ══════════════════════════════════════════════════════════
+   WRITING — ambient pixel field
+   ══════════════════════════════════════════════════════════ */
+const grid    = document.getElementById('grid');
+const gridCtx = grid.getContext('2d');
+let gt = 0, live = false;
+
+function drawGrid() {
+  const w = grid.width, h = grid.height;
+  gridCtx.fillStyle = BG;
+  gridCtx.fillRect(0, 0, w, h);
+  gridCtx.fillStyle = '#ffffff';
+  for (let r = 0; r < Math.ceil(h / BLOCK); r++)
+    for (let c = 0; c < Math.ceil(w / BLOCK); c++) {
+      const bx = c * BLOCK, by = r * BLOCK;
+      const b = Math.max(0, Math.sin(bx / 55 + gt * 0.28) * Math.cos(by / 40 + gt * 0.18));
+      if (b < 0.08) continue;
+      gridCtx.globalAlpha = b * 0.55;
+      gridCtx.fillRect(bx, by, BLOCK - GAP, BLOCK - GAP);
+    }
+  gridCtx.globalAlpha = 1;
+}
+
+function gridLoop() {
+  if (!live) return;
+  gt += 0.010;
+  drawGrid();
+  requestAnimationFrame(gridLoop);
+}
+
+function sizeGrid() {
+  const s = document.getElementById('writing');
+  grid.width  = s.offsetWidth;
+  grid.height = s.offsetHeight;
+}
+
+new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting && !live) { live = true; sizeGrid(); gridLoop(); }
+  else if (!e.isIntersecting)    { live = false; }
+}), { threshold: 0.05 }).observe(document.getElementById('writing'));
+
+window.addEventListener('resize', sizeGrid);
+sizeGrid();
+
+/* ── fade-ins ────────────────────────────────────────────── */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+document.querySelectorAll('.fade').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
